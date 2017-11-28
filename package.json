@@ -9,6 +9,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "command-line-args": "^4.0.7",
+    "command-line-usage": "^4.0.1",
     "fs-extra": "^4.0.2",
     "puppeteer": "^0.12.0"
   },

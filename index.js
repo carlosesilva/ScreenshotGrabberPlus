@@ -1,16 +1,18 @@
 const fs = require('fs-extra');
 const puppeteer = require('puppeteer');
 
-// Grab list of urls.
+// Grab the options from the cli arguments passed in to this program.
+const options = require('./inc/cli-arguments');
+
+// Grab list of urls from file.
 const urls = fs
-  .readFileSync('urls.txt')
+  .readFileSync(options.urls)
   .toString()
   .split('\n');
 
 // Create the screenshots folder.
-const screenshotsPath = './screenshots';
-if (!fs.existsSync(screenshotsPath)) {
-  fs.mkdirSync(screenshotsPath);
+if (!fs.existsSync(options.directory)) {
+  fs.mkdirSync(options.directory);
 }
 
 /**
@@ -31,14 +33,14 @@ const urlToDirectoryName = url => url.replace(/\:\/\//g, '-').replace(/\//g, '%2
 const grabScreenshot = (browser, url) =>
   browser.newPage().then(async (page) => {
     // Create directory for this url.
-    const directoryName = urlToDirectoryName(url);
-    const directoryPath = `${screenshotsPath}/${directoryName}`;
-    if (!fs.existsSync(directoryPath)) {
-      fs.mkdirSync(directoryPath);
+    const pageDirectoryName = urlToDirectoryName(url);
+    const pageDirectoryPath = `${options.directory}/${pageDirectoryName}`;
+    if (!fs.existsSync(pageDirectoryPath)) {
+      fs.mkdirSync(pageDirectoryPath);
     }
     // Construct files paths.
-    const consolePath = `${directoryPath}/console.txt`;
-    const screenshotPath = `${directoryPath}/screenshot.png`;
+    const consolePath = `${pageDirectoryPath}/console.txt`;
+    const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
 
     // Remove exisiting console file because we append to it so we don't want any previous stuff.
     if (fs.existsSync(consolePath)) {

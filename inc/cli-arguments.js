@@ -1,0 +1,58 @@
+/**
+ * All the cli arguments handling
+ */
+
+const commandLineArgs = require('command-line-args');
+const getUsage = require('command-line-usage');
+
+// Define command line args accepted.
+const optionDefinitions = [
+  {
+    name: 'directory',
+    type: String,
+    defaultValue: 'screenshots',
+    description: 'The directory name to save the screenshots in. *Required',
+  },
+  {
+    name: 'urls',
+    type: String,
+    defaultValue: 'urls.txt',
+    description: "The filename containing the list of URLs to load. The default is 'urls.txt'.",
+  },
+  {
+    name: 'verbose',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Display additional program infomation.',
+  },
+  {
+    name: 'help',
+    type: Boolean,
+    description: 'Display this help screen.',
+  },
+];
+
+// Parse command line args.
+const options = commandLineArgs(optionDefinitions);
+
+// Define the help screen to be displayed if --help is present in options
+const usageDefinition = [
+  {
+    header: 'ScreenshotGrabberPlus',
+    content:
+      'Given a list of urls, this app grabs full page screenshots and console messages for each url',
+  },
+  {
+    header: 'Options',
+    optionList: optionDefinitions,
+  },
+];
+
+// If --help is present, display the help screen and exit the program.
+if (options.help) {
+  console.log(getUsage(usageDefinition));
+  process.exit();
+}
+
+// Export the options to be used.
+module.exports = options;
