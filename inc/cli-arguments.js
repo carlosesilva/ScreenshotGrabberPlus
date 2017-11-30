@@ -20,6 +20,12 @@ const optionDefinitions = [
     description: "The filename containing the list of URLs to load. The default is 'urls.txt'.",
   },
   {
+    name: 'batchSize',
+    type: Number,
+    defaultValue: 10,
+    description: 'The number of urls to process per batch.',
+  },
+  {
     name: 'verbose',
     type: Boolean,
     defaultValue: false,
