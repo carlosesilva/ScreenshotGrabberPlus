@@ -119,7 +119,7 @@ class ScreenshotGrabberPlus {
     return this.browser.newPage().then(async (page) => {
       // Create directory for this url.
       const pageDirectoryName = ScreenshotGrabberPlus.urlToDirectoryName(url);
-      const pageDirectoryPath = ScreenshotGrabberPlus.createDir(`${this.directory}/${pageDirectoryName}`);
+      const pageDirectoryPath = ScreenshotGrabberPlus.createDir(`${this.reportDirectory}/${pageDirectoryName}`);
 
       // Construct files paths.
       const consolePath = `${pageDirectoryPath}/console.txt`;
@@ -279,7 +279,7 @@ class ScreenshotGrabberPlus {
   async start() {
     // Create the directory where we will keep all the screenshots.
 
-    this.directory = ScreenshotGrabberPlus.createDir(`${ScreenshotGrabberPlus.createDir('./reports')}/${this.options.directory}`);
+    this.reportDirectory = ScreenshotGrabberPlus.createDir(`${ScreenshotGrabberPlus.createDir('./reports')}/${this.options.directory}`);
 
     // Launch the browser.
     console.log('Starting program');
