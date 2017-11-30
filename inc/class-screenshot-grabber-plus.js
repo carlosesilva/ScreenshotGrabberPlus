@@ -200,7 +200,7 @@ module.exports = class ScreenshotGrabberPlus {
     console.log(`Number of urls: ${this.urls.length}`);
     console.log(`Batch size: ${this.options.batchSize}`);
     console.log(`Number of batches: ${this.urlChunks.length}\n`);
-    this.browser = await puppeteer.launch({ headless: this.options.headless });
+    this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
 
     // If authetication information is present, authenticate it first.
     if (this.authentication) {

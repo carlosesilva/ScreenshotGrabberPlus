@@ -33,10 +33,10 @@ const optionDefinitions = [
     description: 'The number of urls to process per batch.',
   },
   {
-    name: 'headless',
+    name: 'notHeadless',
     type: Boolean,
-    defaultValue: true,
-    description: 'Use headless mode. Default is true.',
+    defaultValue: false,
+    description: 'When specified it will not use headless mode. Default is false.',
   },
   {
     name: 'verbose',
