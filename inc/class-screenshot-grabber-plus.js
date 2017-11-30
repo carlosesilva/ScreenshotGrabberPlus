@@ -116,7 +116,7 @@ module.exports = class ScreenshotGrabberPlus {
     // Keep list of page promises.
     const promises = [];
 
-    console.log(`Starting batch #${this.nextChunk}`);
+    console.log(`Browser #${this.options.browserIndex} is starting its batch #${this.nextChunk}`);
     // Iterate over urls and launch a new page for each one.
     urlBatch.forEach((url) => {
       promises.push(this.grabScreenshot(url));
@@ -196,10 +196,7 @@ module.exports = class ScreenshotGrabberPlus {
     this.reportDirectory = createDir(`${createDir('./reports')}/${this.options.directory}`);
 
     // Launch the browser.
-    console.log('Starting program');
-    console.log(`Number of urls: ${this.urls.length}`);
-    console.log(`Batch size: ${this.options.batchSize}`);
-    console.log(`Number of batches: ${this.urlChunks.length}\n`);
+    console.log(`Starting browser #${this.options.browserIndex}`);
     this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
 
     // If authetication information is present, authenticate it first.
@@ -207,23 +204,11 @@ module.exports = class ScreenshotGrabberPlus {
       await this.authenticate();
     }
 
-    // Capture start time.
-    const startTime = Date.now();
-
     // Process all urls.
     await this.processBatchsRecursive();
 
-    // Capture end time.
-    const endTime = Date.now();
-
-    // Display stats.
-    const totalTimeInSeconds = (endTime - startTime) / 1000;
-    const pagesPerMinute = this.urls.length / (totalTimeInSeconds / 60);
-    console.log(`\nTotal time: ${totalTimeInSeconds} seconds`);
-    console.log(`Speed: ${pagesPerMinute} URLs per minute`);
-
     // Close the browser.
-    console.log('Ending Program');
+    console.log(`Closing browser #${this.options.browserIndex}`);
     await this.browser.close();
   }
 };
