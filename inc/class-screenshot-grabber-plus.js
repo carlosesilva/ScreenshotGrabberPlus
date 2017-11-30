@@ -1,12 +1,12 @@
-const { URL } = require('url');
 const fs = require('fs-extra');
 const puppeteer = require('puppeteer');
+const { getChunks, urlToDirectoryName, createDir } = require('./utils');
 
 /**
  * Class ScreenshotGrabberPlus
  */
 module.exports = class ScreenshotGrabberPlus {
-  constructor(options) {
+  constructor(options, urls) {
     // Save the program options into a local property.
     this.options = options;
 
@@ -14,10 +14,10 @@ module.exports = class ScreenshotGrabberPlus {
     this.authentication = this.readAuthenticationInfo();
 
     // Get list of urls.
-    this.urls = this.readUrls(this.options.urls);
+    this.urls = urls;
 
     // Break list of urls into chunks.
-    this.urlChunks = ScreenshotGrabberPlus.getChunks(this.urls, this.options.batchSize);
+    this.urlChunks = getChunks(this.urls, this.options.batchSize);
 
     // Initialize next chunk index to zero.
     this.nextChunk = 0;
@@ -51,51 +51,6 @@ module.exports = class ScreenshotGrabberPlus {
   }
 
   /**
-   * Reads urls from file into an array
-   *
-   * @param {string} urlsPath - The path to the file with the list of urls.
-   * @return {array} - An array of urls.
-   */
-  readUrls(urlsPath) {
-    // Grab list of urls from file.
-    const rawUrls = fs
-      .readFileSync(urlsPath)
-      .toString()
-      .split('\n');
-
-    // Filter list of urls by only keeping valid ones.
-    const filteredUrls = rawUrls.filter((url) => {
-      // Ignore empty lines.
-      if (url === '') {
-        return false;
-      }
-      // Try to transform url into a URL object.
-      // It will throw an error if it is not valid.
-      try {
-        const validUrl = new URL(url);
-        // No error was thrown so url is valid, lets keep it.
-        return validUrl;
-      } catch (error) {
-        // Display error message if verbose is on.
-        if (this.options.verbose) {
-          console.log(`Removing invalid URL: "${url}"`);
-        }
-
-        // Url was invalid return false.
-        return false;
-      }
-    });
-
-    // If there are no valid URLs, exit early.
-    if (filteredUrls.length === 0) {
-      throw new Error('No valid urls found.');
-    }
-
-    // Return the filtered urls list.
-    return filteredUrls;
-  }
-
-  /**
    * Get the next chunk of urls to be processed
    *
    * @return {array} - The next chunk of urls to be processed.
@@ -115,8 +70,8 @@ module.exports = class ScreenshotGrabberPlus {
   grabScreenshot(url) {
     return this.browser.newPage().then(async (page) => {
       // Create directory for this url.
-      const pageDirectoryName = ScreenshotGrabberPlus.urlToDirectoryName(url);
-      const pageDirectoryPath = ScreenshotGrabberPlus.createDir(`${this.reportDirectory}/${pageDirectoryName}`);
+      const pageDirectoryName = urlToDirectoryName(url);
+      const pageDirectoryPath = createDir(`${this.reportDirectory}/${pageDirectoryName}`);
 
       // Construct files paths.
       const consolePath = `${pageDirectoryPath}/console.txt`;
@@ -233,50 +188,12 @@ module.exports = class ScreenshotGrabberPlus {
   }
 
   /**
-   * Creates a directory
-   *
-   * @param {string} dir - The directory name.
-   */
-  static createDir(dir) {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-    return dir;
-  }
-
-  /**
-   * Splits an array into an array of chunks
-   *
-   * @param {array} arr - The array we want to create chunks from.
-   * @param {int} size - The chunk size.
-   * @return {array} - The chunks.
-   */
-  static getChunks(arr, size) {
-    const arrCopy = arr.slice(0);
-    const chunks = [];
-    while (arrCopy.length > 0) {
-      chunks.push(arrCopy.splice(0, size));
-    }
-    return chunks;
-  }
-
-  /**
-   * Sanitizes the url to use as a directory name
-   *
-   * @param {string} url - The page url.
-   * @return {string} - The sanitized directory name.
-   */
-  static urlToDirectoryName(url) {
-    return url.replace(/:\/\//g, '-').replace(/\//g, '%2F');
-  }
-
-  /**
    * Initializes and processes all urls.
    */
   async start() {
     // Create the directory where we will keep all the screenshots.
 
-    this.reportDirectory = ScreenshotGrabberPlus.createDir(`${ScreenshotGrabberPlus.createDir('./reports')}/${this.options.directory}`);
+    this.reportDirectory = createDir(`${createDir('./reports')}/${this.options.directory}`);
 
     // Launch the browser.
     console.log('Starting program');
