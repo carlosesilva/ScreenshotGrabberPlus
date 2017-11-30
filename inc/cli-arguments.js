@@ -17,7 +17,8 @@ const optionDefinitions = [
     name: 'urls',
     type: String,
     defaultValue: 'urls.txt',
-    description: "The filename containing the list of URLs to load. The default is 'urls.txt'.",
+    description:
+      "The filename of the file containing the list of URLs to load. The default is 'urls.txt'.",
   },
   {
     name: 'batchSize',
@@ -26,10 +27,16 @@ const optionDefinitions = [
     description: 'The number of urls to process per batch.',
   },
   {
+    name: 'headless',
+    type: Boolean,
+    defaultValue: true,
+    description: 'Use headless mode. Default is true.',
+  },
+  {
     name: 'verbose',
     type: Boolean,
     defaultValue: false,
-    description: 'Display additional program infomation.',
+    description: 'Display additional program infomation. Default is false.',
   },
   {
     name: 'help',

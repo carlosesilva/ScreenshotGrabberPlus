@@ -58,8 +58,7 @@ class ScreenshotGrabberPlus {
 
     // If there are no valid URLs, exit early.
     if (filteredUrls.length === 0) {
-      console.log('No valid urls found.');
-      process.exit();
+      throw new Error('No valid urls found.');
     }
 
     // Return the filtered urls list.
@@ -206,8 +205,7 @@ class ScreenshotGrabberPlus {
     console.log(`Number of urls: ${this.urls.length}`);
     console.log(`Batch size: ${this.options.batchSize}`);
     console.log(`Number of batches: ${this.urlChunks.length}\n`);
-
-    this.browser = await puppeteer.launch({ headless: false });
+    this.browser = await puppeteer.launch({ headless: this.options.headless });
 
     // Capture start time.
     const startTime = Date.now();
