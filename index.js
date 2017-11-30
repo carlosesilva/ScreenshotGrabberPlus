@@ -119,10 +119,8 @@ class ScreenshotGrabberPlus {
     return this.browser.newPage().then(async (page) => {
       // Create directory for this url.
       const pageDirectoryName = ScreenshotGrabberPlus.urlToDirectoryName(url);
-      const pageDirectoryPath = `${this.directory}/${pageDirectoryName}`;
-      if (!fs.existsSync(pageDirectoryPath)) {
-        fs.mkdirSync(pageDirectoryPath);
-      }
+      const pageDirectoryPath = ScreenshotGrabberPlus.createDir(`${this.directory}/${pageDirectoryName}`);
+
       // Construct files paths.
       const consolePath = `${pageDirectoryPath}/console.txt`;
       const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
@@ -280,7 +278,8 @@ class ScreenshotGrabberPlus {
    */
   async start() {
     // Create the directory where we will keep all the screenshots.
-    this.directory = ScreenshotGrabberPlus.createDir(`./reports/${this.options.directory}`);
+
+    this.directory = ScreenshotGrabberPlus.createDir(`${ScreenshotGrabberPlus.createDir('./reports')}/${this.options.directory}`);
 
     // Launch the browser.
     console.log('Starting program');
@@ -306,7 +305,7 @@ class ScreenshotGrabberPlus {
     // Display stats.
     const totalTimeInSeconds = (endTime - startTime) / 1000;
     const pagesPerMinute = this.urls.length / (totalTimeInSeconds / 60);
-    console.log(`Total time: ${totalTimeInSeconds} seconds`);
+    console.log(`\nTotal time: ${totalTimeInSeconds} seconds`);
     console.log(`"Speed: ${pagesPerMinute} URLs per minute`);
 
     // Close the browser.
