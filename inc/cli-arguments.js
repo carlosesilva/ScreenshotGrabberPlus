@@ -21,6 +21,12 @@ const optionDefinitions = [
       "The filename of the file containing the list of URLs to load. The default is 'urls.txt'.",
   },
   {
+    name: 'authentication',
+    type: String,
+    defaultValue: false,
+    description: 'The filename of the file containing authentication info if desired.',
+  },
+  {
     name: 'batchSize',
     type: Number,
     defaultValue: 10,

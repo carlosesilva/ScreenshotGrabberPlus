@@ -10,6 +10,9 @@ class ScreenshotGrabberPlus {
     // Save the program options into a local property.
     this.options = options;
 
+    // Read authentication info into a local property.
+    this.authentication = this.readAuthenticationInfo();
+
     // Get list of urls.
     this.urls = this.readUrls(this.options.urls);
 
@@ -21,7 +24,34 @@ class ScreenshotGrabberPlus {
   }
 
   /**
-   * Read urls from file into an array
+   * Reads authentication info if specified in options.
+   *
+   * @return {object|bool} - Returns an object if read in properly or false.
+   */
+  readAuthenticationInfo() {
+    // If authentication file is not specified return false.
+    if (!this.options.authentication) {
+      return false;
+    }
+
+    // Read json file in.
+    const json = fs.readFileSync(this.options.authentication, 'utf8');
+    if (json) {
+      // Parse the json string.
+      const authentication = JSON.parse(json);
+      if (authentication) {
+        // Return the authentication object.
+        return authentication;
+      }
+    }
+
+    // There was an issue reading the authentication json file.
+    console.log('There was an issue reading the authentication json file.');
+    return false;
+  }
+
+  /**
+   * Reads urls from file into an array
    *
    * @param {string} urlsPath - The path to the file with the list of urls.
    * @return {array} - An array of urls.
@@ -156,6 +186,48 @@ class ScreenshotGrabberPlus {
   }
 
   /**
+   * Authenticates before batch processing the urls.
+   */
+  async authenticate() {
+    return this.browser.newPage().then(async (page) => {
+      // Destructure values from this.authentication.
+      const {
+        authenticationUrl,
+        userFieldSelector,
+        passFieldSelector,
+        submitSelector,
+        successSelector,
+        user,
+        pass,
+      } = this.authentication;
+
+      // Fetch login page.
+      console.log('Starting authentication process');
+      await page
+        .goto(authenticationUrl, { waitUntil: 'load' })
+        // Wait for login form.
+        .then(() => page.waitFor(userFieldSelector))
+        // Type username and password.
+        .then(() => page.type(userFieldSelector, user))
+        .then(() => page.type(passFieldSelector, pass))
+        // Click the submit button.
+        .then(() => page.click(submitSelector))
+        .then(() => {
+          console.log('Authentication form submitted, waiting for authentication');
+          return page.waitFor(successSelector);
+        })
+        .then(() => console.log('Authentication process successful\n'))
+        // Close the page.
+        .then(() => page.close())
+        .catch((error) => {
+          console.log('Error: There was an error during authentication. See error below for more information.');
+          console.log(error);
+          process.exit(1);
+        });
+    });
+  }
+
+  /**
    * Creates a directory
    *
    * @param {string} dir - The directory name.
@@ -206,6 +278,11 @@ class ScreenshotGrabberPlus {
     console.log(`Batch size: ${this.options.batchSize}`);
     console.log(`Number of batches: ${this.urlChunks.length}\n`);
     this.browser = await puppeteer.launch({ headless: this.options.headless });
+
+    // If authetication information is present, authenticate it first.
+    if (this.authentication) {
+      await this.authenticate();
+    }
 
     // Capture start time.
     const startTime = Date.now();
