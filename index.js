@@ -5,6 +5,9 @@ const puppeteer = require('puppeteer');
 // Grab the options from the cli arguments passed in to this program.
 const input = require('./inc/cli-arguments');
 
+/**
+ * Class ScreenshotGrabberPlus
+ */
 class ScreenshotGrabberPlus {
   constructor(options) {
     // Save the program options into a local property.
@@ -177,11 +180,18 @@ class ScreenshotGrabberPlus {
    * Recursively process all batches
    */
   async processBatchsRecursive() {
+    // Get next chunk of urls.
     const chunk = this.getNextChunk();
+
+    // If there are no more chunks to process, exit the recursion by returning true.
     if (!chunk) {
       return true;
     }
+
+    // Process the current batch of urls.
     await this.processBatch(chunk);
+
+    // Process the next batch of urls.
     return this.processBatchsRecursive();
   }
 
