@@ -4,13 +4,14 @@
 
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
+const { getValidDatePath } = require('./utils');
 
 // Define command line args accepted.
 const optionDefinitions = [
   {
     name: 'directory',
     type: String,
-    defaultValue: 'screenshots',
+    defaultValue: getValidDatePath(new Date()),
     description: 'The directory name to save the screenshots in. *Required',
   },
   {

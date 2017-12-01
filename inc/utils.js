@@ -81,3 +81,23 @@ module.exports.createDir = (dir) => {
   }
   return dir;
 };
+
+/**
+ * Formats date object so it is valid to use as a directory/file name
+ *
+ * @param {date} - The date object we want for format.
+ * @return {string} - The formatted current datetime string.
+ */
+module.exports.getValidDatePath = (dateObj) => {
+  // Get timezone offset and convert it from minutes to seconds
+  const timezoneOffsetInSeconds = new Date().getTimezoneOffset() * 60 * 1000;
+  // Subtract the timezone offset from the dateObj so that when we convert it to ISO
+  // it will represent the local date time.
+  const localISO = new Date(dateObj.getTime() - timezoneOffsetInSeconds).toISOString();
+  // Format the iso string into a valid path name
+  const formattedDate = localISO
+    .substr(0, 19)
+    .replace(/[-:]/g, '')
+    .replace('T', '-');
+  return formattedDate;
+};
