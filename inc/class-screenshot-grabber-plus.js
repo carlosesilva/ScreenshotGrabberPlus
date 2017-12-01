@@ -48,36 +48,40 @@ module.exports = class ScreenshotGrabberPlus {
    * @return {Promise} - A promise that doesn't return anything.
    */
   grabScreenshot(url) {
-    return this.browser.newPage().then(async (page) => {
-      // Create directory for this url.
-      const pageDirectoryName = urlToDirectoryName(url);
-      const pageDirectoryPath = createDir(`${this.options.reportDirectory}/${pageDirectoryName}`);
+    return (
+      this.browser
+        .newPage()
+        .then(async (page) => {
+          // Create directory for this url.
+          const pageDirectoryName = urlToDirectoryName(url);
+          const pageDirectoryPath = createDir(`${this.options.reportDirectory}/${pageDirectoryName}`);
 
-      // Construct files paths.
-      const consolePath = `${pageDirectoryPath}/console.txt`;
-      const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
+          // Construct files paths.
+          const consolePath = `${pageDirectoryPath}/console.txt`;
+          const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
 
-      // Remove exisiting console file because we append to it so we don't want any previous stuff.
-      if (fs.existsSync(consolePath)) {
-        fs.unlinkSync(consolePath);
-      }
+          // Remove exisiting console file because we append to it so we don't want any previous stuff.
+          if (fs.existsSync(consolePath)) {
+            fs.unlinkSync(consolePath);
+          }
 
-      // Add event listener for console messages. Append it to a txt file.
-      page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
+          // Add event listener for console messages. Append it to a txt file.
+          page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
 
-      // Fetch page.
-      await page
-        .goto(url, { waitUntil: 'networkidle2' })
-        // Grab screenshot.
-        .then(() =>
-          page.screenshot({
-            path: screenshotPath,
-            fullPage: true,
-          }))
-        // Close the page.
-        .then(() => page.close())
-        // If everything went ok, display a checkmark with the url.
-        .then(() => this.browserLog(`${chalk.green('\u2714')} ${url}`))
+          // Fetch page.
+          await page
+            .goto(url, { waitUntil: 'networkidle2' })
+            // Grab screenshot.
+            .then(() =>
+              page.screenshot({
+                path: screenshotPath,
+                fullPage: true,
+              }))
+            // Close the page.
+            .then(() => page.close())
+            // If everything went ok, display a checkmark with the url.
+            .then(() => this.browserLog(`${chalk.green('\u2714')} ${url}`));
+        })
         // Catch any errors and display an X with the url.
         .catch((error) => {
           this.pageErrors.push({
@@ -86,8 +90,8 @@ module.exports = class ScreenshotGrabberPlus {
           });
           this.browserLog(`${chalk.red('\u2716')} ${url}`);
           this.browserLog(error, true);
-        });
-    });
+        })
+    );
   }
 
   /**
