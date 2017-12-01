@@ -1,6 +1,11 @@
 const cp = require('child_process');
 const {
-  readUrls, readAuthenticationInfo, getChunks, createDir, log,
+  readUrls,
+  readAuthenticationInfo,
+  getChunks,
+  createDir,
+  log,
+  chalkRainbow,
 } = require('./inc/utils');
 
 // Grab the options from the cli arguments passed in to this program.
@@ -8,6 +13,10 @@ const options = require('./inc/cli-arguments');
 
 // Start main program.
 (async () => {
+  console.log(chalkRainbow('-----------------------'));
+  console.log(chalkRainbow('Screenshot Grabber Plus'));
+  console.log(chalkRainbow('-----------------------\n'));
+
   // Create the directory where we will keep all the screenshots.
   options.reportDirectory = createDir(`${createDir('./reports')}/${options.directory}`);
 

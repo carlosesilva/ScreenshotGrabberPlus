@@ -1,5 +1,6 @@
 const { URL } = require('url');
 const fs = require('fs-extra');
+const chalk = require('chalk');
 
 /**
  * Returns a copy of the array with unique items only.
@@ -161,4 +162,17 @@ module.exports.log = (path, message, skipConsoleLog = false) => {
   if (!skipConsoleLog) {
     console.log(message);
   }
+};
+
+module.exports.chalkRainbow = (str) => {
+  const letters = str.split('');
+  const colors = ['red', 'yellow', 'green', 'cyan', 'blue', 'magenta'];
+  const colorsCount = colors.length;
+
+  return letters
+    .map((l, i) => {
+      const color = colors[i % colorsCount];
+      return chalk[color](l);
+    })
+    .join('');
 };

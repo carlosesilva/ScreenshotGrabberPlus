@@ -1,5 +1,6 @@
 const fs = require('fs-extra');
 const puppeteer = require('puppeteer');
+const chalk = require('chalk');
 const {
   getChunks, urlToDirectoryName, createDir, log,
 } = require('./utils');
@@ -72,10 +73,10 @@ module.exports = class ScreenshotGrabberPlus {
         // Close the page.
         .then(() => page.close())
         // If everything went ok, display a checkmark with the url.
-        .then(() => this.browserLog(`\u2714 ${url}`))
+        .then(() => this.browserLog(`${chalk.green('\u2714')} ${url}`))
         // Catch any errors and display an X with the url.
         .catch((error) => {
-          this.browserLog(`\u2716 ${url}`);
+          this.browserLog(`${chalk.red('\u2716')} ${url}`);
           this.browserLog(error, true);
         });
     });
