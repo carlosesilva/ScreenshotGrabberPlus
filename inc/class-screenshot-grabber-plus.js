@@ -24,6 +24,9 @@ module.exports = class ScreenshotGrabberPlus {
 
     // Initialize next chunk index to zero.
     this.nextChunk = 0;
+
+    // Initialize array of page errors with an empty array.
+    this.pageErrors = [];
   }
 
   /**
@@ -63,7 +66,7 @@ module.exports = class ScreenshotGrabberPlus {
 
       // Fetch page.
       await page
-        .goto(url, { waitUntil: 'load' })
+        .goto(url, { waitUntil: 'networkidle2' })
         // Grab screenshot.
         .then(() =>
           page.screenshot({
@@ -76,6 +79,10 @@ module.exports = class ScreenshotGrabberPlus {
         .then(() => this.browserLog(`${chalk.green('\u2714')} ${url}`))
         // Catch any errors and display an X with the url.
         .catch((error) => {
+          this.pageErrors.push({
+            url,
+            error,
+          });
           this.browserLog(`${chalk.red('\u2716')} ${url}`);
           this.browserLog(error, true);
         });
@@ -195,5 +202,7 @@ module.exports = class ScreenshotGrabberPlus {
     // Close the browser.
     this.browserLog('Ending', true);
     await this.browser.close();
+
+    return { pageErrors: this.pageErrors };
   }
 };

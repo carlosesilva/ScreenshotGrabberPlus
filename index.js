@@ -69,7 +69,7 @@ const options = require('./inc/cli-arguments');
     }));
 
   // Wait for all child promisses to complete.
-  await Promise.all(childPromises);
+  const results = await Promise.all(childPromises);
 
   // Capture end time.
   const endTime = Date.now();
@@ -78,8 +78,13 @@ const options = require('./inc/cli-arguments');
   const totalTimeInSeconds = (endTime - startTime) / 1000;
   const pagesPerMinute = urls.length / (totalTimeInSeconds / 60);
 
+  // Sum up the total number of page errors from all the child processes.
+  const totalPageErrors = results.reduce(result => result.payload.pageErrors.length);
+
   // Display performance stats
-  log(options.logFile, '\nEnding main program');
-  log(options.logFile, `Total time: ${totalTimeInSeconds} seconds`);
-  log(options.logFile, `Speed: ${pagesPerMinute} URLs per minute`);
+  log(options.logFile, '\n');
+  log(options.logFile, `Total time: ${totalTimeInSeconds.toFixed(2)} seconds`);
+  log(options.logFile, `Speed: ${pagesPerMinute.toFixed(2)} URLs per minute`);
+  log(options.logFile, `Total number of page failures: ${totalPageErrors}`);
+  console.log(`See the log file for more information: ${options.logFile}`);
 })();
