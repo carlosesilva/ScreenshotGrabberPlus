@@ -28,8 +28,13 @@ const options = require('./inc/cli-arguments');
   // Read urls from file.
   const urls = readUrls(options.urls, options.verbose);
 
-  // Divide urls into chunks for each subprocess/
-  const processUrlChunkSize = Math.ceil(urls.length / options.numBrowsers);
+  // Divide urls into chunks for each subprocess
+  // Since we don't want the chunk size to be smaller than options.batchSize
+  // We will use the bigger of urls.length/numBrowsers and batchSize for the chunk size.
+  const processUrlChunkSize = Math.max(
+    Math.ceil(urls.length / options.numBrowsers),
+    options.batchSize,
+  );
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
 
   // If authentication file is specified, add the info to the options object.
