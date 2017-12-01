@@ -61,21 +61,23 @@ module.exports = class ScreenshotGrabberPlus {
       page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
 
       // Fetch page.
-      await page.goto(url, { waitUntil: 'load' }).catch((error) => {
-        this.browserLog(`\u2716 ${url}`);
-        this.browserLog(error, true);
-      });
-
-      // Grab screenshot.
       await page
-        .screenshot({
-          path: screenshotPath,
-          fullPage: true,
-        })
-        .then(() => this.browserLog(`\u2714 ${url}`));
-
-      // Close the page.
-      await page.close();
+        .goto(url, { waitUntil: 'load' })
+        // Grab screenshot.
+        .then(() =>
+          page.screenshot({
+            path: screenshotPath,
+            fullPage: true,
+          }))
+        // Close the page.
+        .then(() => page.close())
+        // If everything went ok, display a checkmark with the url.
+        .then(() => this.browserLog(`\u2714 ${url}`))
+        // Catch any errors and display an X with the url.
+        .catch((error) => {
+          this.browserLog(`\u2716 ${url}`);
+          this.browserLog(error, true);
+        });
     });
   }
 
