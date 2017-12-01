@@ -1,14 +1,20 @@
 const cp = require('child_process');
-const { readUrls, getChunks, createDir } = require('./inc/utils');
+const {
+  readUrls, getChunks, createDir, log,
+} = require('./inc/utils');
 
 // Grab the options from the cli arguments passed in to this program.
 const options = require('./inc/cli-arguments');
 
-console.log(options);
-
 // Start main program.
 (async () => {
-  console.log('Starting main program\n');
+  // Create the directory where we will keep all the screenshots.
+  options.reportDirectory = createDir(`${createDir('./reports')}/${options.directory}`);
+
+  // Construct log file path.
+  options.logFile = `${options.reportDirectory}/log.txt`;
+
+  log(options.logFile, 'Starting main program\n');
 
   // Read urls from file.
   const urls = readUrls(options.urls, options.verbose);
@@ -17,14 +23,11 @@ console.log(options);
   const processUrlChunkSize = Math.ceil(urls.length / options.numBrowsers);
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
 
-  // Create the directory where we will keep all the screenshots.
-  options.reportDirectory = createDir(`${createDir('./reports')}/${options.directory}`);
-
   // Report initial stats.
-  console.log(`Number of urls: ${urls.length}`);
-  console.log(`Batch size: ${options.batchSize}`);
-  console.log(`Number of batches: ${Math.ceil(urls.length / options.batchSize)}`);
-  console.log(`Number of concurent browsers: ${processUrlChunks.length}\n`);
+  log(options.logFile, `Number of urls: ${urls.length}`);
+  log(options.logFile, `Batch size: ${options.batchSize}`);
+  log(options.logFile, `Number of batches: ${Math.ceil(urls.length / options.batchSize)}`);
+  log(options.logFile, `Number of concurent browsers: ${processUrlChunks.length}\n`);
 
   // Capture start time.
   const startTime = Date.now();
@@ -58,7 +61,7 @@ console.log(options);
   const pagesPerMinute = urls.length / (totalTimeInSeconds / 60);
 
   // Display performance stats
-  console.log('\nEnding main program');
-  console.log(`Total time: ${totalTimeInSeconds} seconds`);
-  console.log(`Speed: ${pagesPerMinute} URLs per minute`);
+  log(options.logFile, '\nEnding main program');
+  log(options.logFile, `Total time: ${totalTimeInSeconds} seconds`);
+  log(options.logFile, `Speed: ${pagesPerMinute} URLs per minute`);
 })();

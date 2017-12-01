@@ -101,3 +101,17 @@ module.exports.getValidDatePath = (dateObj) => {
     .replace('T', '-');
   return formattedDate;
 };
+
+/**
+ * Appends message to log file and console log it if specified
+ *
+ * @param {string} path - The file to append the log message.
+ * @param {string} message - The message to be logged.
+ * @param {boolean} consoleLogIt - Console.log the message
+ */
+module.exports.log = (path, message, skipConsoleLog = false) => {
+  fs.appendFile(path, `${message}\n`);
+  if (!skipConsoleLog) {
+    console.log(message);
+  }
+};

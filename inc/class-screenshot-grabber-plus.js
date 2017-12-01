@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const puppeteer = require('puppeteer');
-const { getChunks, urlToDirectoryName, createDir } = require('./utils');
+const {
+  getChunks, urlToDirectoryName, createDir, log,
+} = require('./utils');
 
 /**
  * Class ScreenshotGrabberPlus
@@ -46,7 +48,7 @@ module.exports = class ScreenshotGrabberPlus {
     }
 
     // There was an issue reading the authentication json file.
-    console.log('There was an issue reading the authentication json file.');
+    this.browserLog('There was an issue reading the authentication json file.');
     return false;
   }
 
@@ -87,10 +89,8 @@ module.exports = class ScreenshotGrabberPlus {
 
       // Fetch page.
       await page.goto(url, { waitUntil: 'load' }).catch((error) => {
-        console.log(`Error: ${url}`);
-        if (this.options.verbose) {
-          console.log(error);
-        }
+        this.browserLog(`\u2716 ${url}`);
+        this.browserLog(error, true);
       });
 
       // Grab screenshot.
@@ -99,7 +99,7 @@ module.exports = class ScreenshotGrabberPlus {
           path: screenshotPath,
           fullPage: true,
         })
-        .then(() => console.log(`Success: ${url}`));
+        .then(() => this.browserLog(`\u2714 ${url}`));
 
       // Close the page.
       await page.close();
@@ -116,7 +116,7 @@ module.exports = class ScreenshotGrabberPlus {
     // Keep list of page promises.
     const promises = [];
 
-    console.log(`Browser #${this.options.browserIndex} is starting its batch #${this.nextChunk}`);
+    this.browserLog(`Starting batch #${this.nextChunk}`, true);
     // Iterate over urls and launch a new page for each one.
     urlBatch.forEach((url) => {
       promises.push(this.grabScreenshot(url));
@@ -162,7 +162,7 @@ module.exports = class ScreenshotGrabberPlus {
       } = this.authentication;
 
       // Fetch login page.
-      console.log('Starting authentication process');
+      this.browserLog('Starting authentication process', true);
       await page
         .goto(authenticationUrl, { waitUntil: 'load' })
         // Wait for login form.
@@ -173,18 +173,31 @@ module.exports = class ScreenshotGrabberPlus {
         // Click the submit button.
         .then(() => page.click(submitSelector))
         .then(() => {
-          console.log('Authentication form submitted, waiting for authentication');
+          this.browserLog('Authentication form submitted, waiting for authentication', true);
           return page.waitFor(successSelector);
         })
-        .then(() => console.log('Authentication process successful\n'))
+        .then(() => this.browserLog('Authentication process successful\n', true))
         // Close the page.
         .then(() => page.close())
         .catch((error) => {
-          console.log('Error: There was an error during authentication. See error below for more information.');
-          console.log(error);
+          this.browserLog('There was an error during authentication. See error below for more information.');
+          this.browserLog(error);
           process.exit(1);
         });
     });
+  }
+
+  /**
+   * Wrapper around the log util that adds the browser number to the message
+   *
+   * @param {string} m - The message to be logged.
+   * @param {boolean} isVerbose - Whether this message is verbose or not.
+   */
+  browserLog(m, isVerbose = false) {
+    // Prepend browser index to message
+    const message = `Browser #${this.options.browserIndex}: ${m}`;
+    const skipConsoleLog = isVerbose && !this.options.verbose;
+    log(this.options.logFile, message, skipConsoleLog);
   }
 
   /**
@@ -192,7 +205,7 @@ module.exports = class ScreenshotGrabberPlus {
    */
   async start() {
     // Launch the browser.
-    console.log(`Starting browser #${this.options.browserIndex}`);
+    this.browserLog('Starting', true);
     this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
 
     // If authetication information is present, authenticate it first.
@@ -204,7 +217,7 @@ module.exports = class ScreenshotGrabberPlus {
     await this.processBatchsRecursive();
 
     // Close the browser.
-    console.log(`Closing browser #${this.options.browserIndex}`);
+    this.browserLog('Ending', true);
     await this.browser.close();
   }
 };
