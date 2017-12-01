@@ -6,8 +6,6 @@ const options = require('./inc/cli-arguments');
 
 console.log(options);
 
-const numProccesses = 4;
-
 // Start main program.
 (async () => {
   console.log('Starting main program\n');
@@ -16,7 +14,7 @@ const numProccesses = 4;
   const urls = readUrls(options.urls, options.verbose);
 
   // Divide urls into chunks for each subprocess/
-  const processUrlChunkSize = Math.ceil(urls.length / numProccesses);
+  const processUrlChunkSize = Math.ceil(urls.length / options.numBrowsers);
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
 
   // Report initial stats.

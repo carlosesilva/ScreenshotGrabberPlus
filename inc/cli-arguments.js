@@ -30,8 +30,14 @@ const optionDefinitions = [
   {
     name: 'batchSize',
     type: Number,
-    defaultValue: 10,
+    defaultValue: 5,
     description: 'The number of urls to process per batch.',
+  },
+  {
+    name: 'numBrowsers',
+    type: Number,
+    defaultValue: 4,
+    description: 'The number of browsers to use concurrently.',
   },
   {
     name: 'notHeadless',
