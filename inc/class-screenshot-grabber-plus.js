@@ -15,6 +15,7 @@ module.exports = class ScreenshotGrabberPlus {
 
     // Save authentication info into a local property.
     this.authentication = this.options.authenticationInfo;
+    this.authenticationReAttemptsRemaining = 2;
 
     // Get list of urls.
     this.urls = urls;
@@ -146,28 +147,47 @@ module.exports = class ScreenshotGrabberPlus {
 
       // Fetch login page.
       this.browserLog('Starting authentication process', true);
-      await page
-        .goto(authenticationUrl, { waitUntil: 'load' })
-        // Wait for login form.
-        .then(() => page.waitFor(userFieldSelector))
-        // Type username and password.
-        .then(() => page.type(userFieldSelector, user))
-        .then(() => page.type(passFieldSelector, pass))
-        // Click the submit button.
-        .then(() => page.click(submitSelector))
-        .then(() => {
-          this.browserLog('Authentication form submitted, waiting for authentication', true);
-          return page.waitFor(successSelector);
-        })
-        .then(() => this.browserLog('Authentication process successful\n', true))
-        // Close the page.
-        .then(() => page.close())
-        .catch((error) => {
-          this.browserLog('There was an error during authentication. See error below for more information.');
-          this.browserLog(error);
-          process.exit(1);
-        });
+      return (
+        page
+          .goto(authenticationUrl, { waitUntil: 'networkidle2' })
+          // Wait for login form.
+          .then(() => page.waitFor(userFieldSelector))
+          // Type username and password.
+          .then(() => page.type(userFieldSelector, user))
+          .then(() => page.type(passFieldSelector, pass))
+          // Click the submit button.
+          .then(() => page.click(submitSelector))
+          // Confirm authentication was successful.
+          .then(() => {
+            this.browserLog('Authentication form submitted, waiting for authentication', true);
+            return page.waitFor(successSelector);
+          })
+          // Close the page.
+          .then(() => page.close())
+          .then(() => true)
+          // Catch any errors during authentication.
+          .catch(error => this.handleFailedAuthentication(error))
+      );
     });
+  }
+
+  /**
+   * Re-attempts to authenticate on authentication failure.
+   *
+   * @param {object} error - The error thrown by authenticate().
+   */
+  async handleFailedAuthentication(error) {
+    if (this.authenticationReAttemptsRemaining > 0) {
+      // Decrement the number of authenticationReAttemptsRemaining.
+      this.authenticationReAttemptsRemaining -= 1;
+      this.browserLog(`Authentication failed. Attempting to authenticate again. (${
+        this.authenticationReAttemptsRemaining
+      } attempts remaining)`);
+      // Re-attempt to authenticate.
+      return this.authenticate();
+    }
+    // No re-authentication attempts remaining. Return the error.
+    return error;
   }
 
   /**
@@ -191,9 +211,16 @@ module.exports = class ScreenshotGrabberPlus {
     this.browserLog('Starting', true);
     this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
 
-    // If authetication information is present, authenticate it first.
+    // If authentication information is present, authenticate it first.
     if (this.authentication) {
-      await this.authenticate();
+      const authenticationResult = await this.authenticate();
+      if (authenticationResult === true) {
+        this.browserLog('Authentication process successful');
+      } else {
+        this.browserLog('Unable to authenticate.');
+        this.browserLog(authenticationResult, true);
+        process.exit(1);
+      }
     }
 
     // Process all urls.
