@@ -12,8 +12,8 @@ module.exports = class ScreenshotGrabberPlus {
     // Save the program options into a local property.
     this.options = options;
 
-    // Read authentication info into a local property.
-    this.authentication = this.readAuthenticationInfo();
+    // Save authentication info into a local property.
+    this.authentication = this.options.authenticationInfo;
 
     // Get list of urls.
     this.urls = urls;
@@ -23,33 +23,6 @@ module.exports = class ScreenshotGrabberPlus {
 
     // Initialize next chunk index to zero.
     this.nextChunk = 0;
-  }
-
-  /**
-   * Reads authentication info if specified in options.
-   *
-   * @return {object|bool} - Returns an object if read in properly or false.
-   */
-  readAuthenticationInfo() {
-    // If authentication file is not specified return false.
-    if (!this.options.authentication) {
-      return false;
-    }
-
-    // Read json file in.
-    const json = fs.readFileSync(this.options.authentication, 'utf8');
-    if (json) {
-      // Parse the json string.
-      const authentication = JSON.parse(json);
-      if (authentication) {
-        // Return the authentication object.
-        return authentication;
-      }
-    }
-
-    // There was an issue reading the authentication json file.
-    this.browserLog('There was an issue reading the authentication json file.');
-    return false;
   }
 
   /**

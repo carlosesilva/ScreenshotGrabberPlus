@@ -47,6 +47,28 @@ module.exports.readUrls = (urlsPath, verbose = false) => {
 };
 
 /**
+ * Reads authentication info from json file
+ *
+ * @return {object|bool} - Returns an object if read in properly or false.
+ */
+module.exports.readAuthenticationInfo = (file) => {
+  // Read json file in.
+  const json = fs.readFileSync(file, 'utf8');
+  if (json) {
+    // Parse the json string.
+    const authentication = JSON.parse(json);
+    if (authentication) {
+      // Return the authentication object.
+      return authentication;
+    }
+  }
+
+  // There was an issue reading the authentication json file.
+  this.browserLog('There was an issue reading the authentication json file.');
+  return false;
+};
+
+/**
  * Splits an array into an array of arrays of the specified chunk size
  *
  * @param {array} arr - The array we want to create chunks from.

@@ -1,6 +1,6 @@
 const cp = require('child_process');
 const {
-  readUrls, getChunks, createDir, log,
+  readUrls, readAuthenticationInfo, getChunks, createDir, log,
 } = require('./inc/utils');
 
 // Grab the options from the cli arguments passed in to this program.
@@ -22,6 +22,11 @@ const options = require('./inc/cli-arguments');
   // Divide urls into chunks for each subprocess/
   const processUrlChunkSize = Math.ceil(urls.length / options.numBrowsers);
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
+
+  // If authentication file is specified, add the info to the options object.
+  if (options.authentication) {
+    options.authenticationInfo = readAuthenticationInfo(options.authentication);
+  }
 
   // Report initial stats.
   log(options.logFile, `Number of urls: ${urls.length}`);
