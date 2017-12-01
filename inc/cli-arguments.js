@@ -37,13 +37,13 @@ const optionDefinitions = [
     name: 'notHeadless',
     type: Boolean,
     defaultValue: false,
-    description: 'When specified it will not use headless mode. Default is false.',
+    description: "Don't use headless mode.",
   },
   {
     name: 'verbose',
     type: Boolean,
     defaultValue: false,
-    description: 'Display additional program infomation. Default is false.',
+    description: 'Display additional program infomation.',
   },
   {
     name: 'help',
