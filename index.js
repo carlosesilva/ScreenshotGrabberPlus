@@ -11,6 +11,24 @@ const {
 // Grab the options from the cli arguments passed in to this program.
 const options = require('./inc/cli-arguments');
 
+// Keep track of all child processes we will be forking.
+const childProcesses = [];
+
+/**
+ * Kill all child processes and exit the program.
+ */
+function exit() {
+  console.log('\nClosing all browsers and exiting');
+  console.log(`See the log file for more information: ${options.logFile}`);
+  childProcesses.forEach(child => child.kill('SIGINT'));
+  process.exit(1);
+}
+
+// On interrupt signal kill all subprocesses.
+process.on('SIGINT', () => {
+  exit();
+});
+
 // Start main program.
 (async () => {
   // Display program name.
@@ -56,6 +74,9 @@ const options = require('./inc/cli-arguments');
       // Fork a new child process.
       const child = cp.fork('./sub.js');
 
+      // Push new process to childProcesses array.
+      childProcesses.push(child);
+
       // Listen for child events.
       child.on('error', reject);
       child.on('exit', reject);
@@ -69,7 +90,10 @@ const options = require('./inc/cli-arguments');
     }));
 
   // Wait for all child promisses to complete.
-  const results = await Promise.all(childPromises);
+  const results = await Promise.all(childPromises).catch((error) => {
+    log(options.logFile, 'There was an error within one of the child processes.');
+    exit();
+  });
 
   // Capture end time.
   const endTime = Date.now();
