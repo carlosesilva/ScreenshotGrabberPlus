@@ -4,13 +4,14 @@
 
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
+const { getValidDatePath } = require('./utils');
 
 // Define command line args accepted.
 const optionDefinitions = [
   {
     name: 'directory',
     type: String,
-    defaultValue: 'screenshots',
+    defaultValue: getValidDatePath(new Date()),
     description: 'The directory name to save the screenshots in. *Required',
   },
   {
@@ -29,20 +30,26 @@ const optionDefinitions = [
   {
     name: 'batchSize',
     type: Number,
-    defaultValue: 10,
+    defaultValue: 5,
     description: 'The number of urls to process per batch.',
   },
   {
-    name: 'headless',
+    name: 'numBrowsers',
+    type: Number,
+    defaultValue: 4,
+    description: 'The number of browsers to use concurrently.',
+  },
+  {
+    name: 'notHeadless',
     type: Boolean,
-    defaultValue: true,
-    description: 'Use headless mode. Default is true.',
+    defaultValue: false,
+    description: "Don't use headless mode.",
   },
   {
     name: 'verbose',
     type: Boolean,
     defaultValue: false,
-    description: 'Display additional program infomation. Default is false.',
+    description: 'Display additional program infomation.',
   },
   {
     name: 'help',

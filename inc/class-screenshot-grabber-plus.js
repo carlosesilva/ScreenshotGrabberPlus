@@ -1,98 +1,28 @@
-const { URL } = require('url');
 const fs = require('fs-extra');
 const puppeteer = require('puppeteer');
+const {
+  getChunks, urlToDirectoryName, createDir, log,
+} = require('./utils');
 
 /**
  * Class ScreenshotGrabberPlus
  */
 module.exports = class ScreenshotGrabberPlus {
-  constructor(options) {
+  constructor(options, urls) {
     // Save the program options into a local property.
     this.options = options;
 
-    // Read authentication info into a local property.
-    this.authentication = this.readAuthenticationInfo();
+    // Save authentication info into a local property.
+    this.authentication = this.options.authenticationInfo;
 
     // Get list of urls.
-    this.urls = this.readUrls(this.options.urls);
+    this.urls = urls;
 
     // Break list of urls into chunks.
-    this.urlChunks = ScreenshotGrabberPlus.getChunks(this.urls, this.options.batchSize);
+    this.urlChunks = getChunks(this.urls, this.options.batchSize);
 
     // Initialize next chunk index to zero.
     this.nextChunk = 0;
-  }
-
-  /**
-   * Reads authentication info if specified in options.
-   *
-   * @return {object|bool} - Returns an object if read in properly or false.
-   */
-  readAuthenticationInfo() {
-    // If authentication file is not specified return false.
-    if (!this.options.authentication) {
-      return false;
-    }
-
-    // Read json file in.
-    const json = fs.readFileSync(this.options.authentication, 'utf8');
-    if (json) {
-      // Parse the json string.
-      const authentication = JSON.parse(json);
-      if (authentication) {
-        // Return the authentication object.
-        return authentication;
-      }
-    }
-
-    // There was an issue reading the authentication json file.
-    console.log('There was an issue reading the authentication json file.');
-    return false;
-  }
-
-  /**
-   * Reads urls from file into an array
-   *
-   * @param {string} urlsPath - The path to the file with the list of urls.
-   * @return {array} - An array of urls.
-   */
-  readUrls(urlsPath) {
-    // Grab list of urls from file.
-    const rawUrls = fs
-      .readFileSync(urlsPath)
-      .toString()
-      .split('\n');
-
-    // Filter list of urls by only keeping valid ones.
-    const filteredUrls = rawUrls.filter((url) => {
-      // Ignore empty lines.
-      if (url === '') {
-        return false;
-      }
-      // Try to transform url into a URL object.
-      // It will throw an error if it is not valid.
-      try {
-        const validUrl = new URL(url);
-        // No error was thrown so url is valid, lets keep it.
-        return validUrl;
-      } catch (error) {
-        // Display error message if verbose is on.
-        if (this.options.verbose) {
-          console.log(`Removing invalid URL: "${url}"`);
-        }
-
-        // Url was invalid return false.
-        return false;
-      }
-    });
-
-    // If there are no valid URLs, exit early.
-    if (filteredUrls.length === 0) {
-      throw new Error('No valid urls found.');
-    }
-
-    // Return the filtered urls list.
-    return filteredUrls;
   }
 
   /**
@@ -115,8 +45,8 @@ module.exports = class ScreenshotGrabberPlus {
   grabScreenshot(url) {
     return this.browser.newPage().then(async (page) => {
       // Create directory for this url.
-      const pageDirectoryName = ScreenshotGrabberPlus.urlToDirectoryName(url);
-      const pageDirectoryPath = ScreenshotGrabberPlus.createDir(`${this.reportDirectory}/${pageDirectoryName}`);
+      const pageDirectoryName = urlToDirectoryName(url);
+      const pageDirectoryPath = createDir(`${this.options.reportDirectory}/${pageDirectoryName}`);
 
       // Construct files paths.
       const consolePath = `${pageDirectoryPath}/console.txt`;
@@ -131,23 +61,23 @@ module.exports = class ScreenshotGrabberPlus {
       page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
 
       // Fetch page.
-      await page.goto(url, { waitUntil: 'load' }).catch((error) => {
-        console.log(`Error: ${url}`);
-        if (this.options.verbose) {
-          console.log(error);
-        }
-      });
-
-      // Grab screenshot.
       await page
-        .screenshot({
-          path: screenshotPath,
-          fullPage: true,
-        })
-        .then(() => console.log(`Success: ${url}`));
-
-      // Close the page.
-      await page.close();
+        .goto(url, { waitUntil: 'load' })
+        // Grab screenshot.
+        .then(() =>
+          page.screenshot({
+            path: screenshotPath,
+            fullPage: true,
+          }))
+        // Close the page.
+        .then(() => page.close())
+        // If everything went ok, display a checkmark with the url.
+        .then(() => this.browserLog(`\u2714 ${url}`))
+        // Catch any errors and display an X with the url.
+        .catch((error) => {
+          this.browserLog(`\u2716 ${url}`);
+          this.browserLog(error, true);
+        });
     });
   }
 
@@ -161,7 +91,7 @@ module.exports = class ScreenshotGrabberPlus {
     // Keep list of page promises.
     const promises = [];
 
-    console.log(`Starting batch #${this.nextChunk}`);
+    this.browserLog(`Starting batch #${this.nextChunk}`, true);
     // Iterate over urls and launch a new page for each one.
     urlBatch.forEach((url) => {
       promises.push(this.grabScreenshot(url));
@@ -207,7 +137,7 @@ module.exports = class ScreenshotGrabberPlus {
       } = this.authentication;
 
       // Fetch login page.
-      console.log('Starting authentication process');
+      this.browserLog('Starting authentication process', true);
       await page
         .goto(authenticationUrl, { waitUntil: 'load' })
         // Wait for login form.
@@ -218,95 +148,51 @@ module.exports = class ScreenshotGrabberPlus {
         // Click the submit button.
         .then(() => page.click(submitSelector))
         .then(() => {
-          console.log('Authentication form submitted, waiting for authentication');
+          this.browserLog('Authentication form submitted, waiting for authentication', true);
           return page.waitFor(successSelector);
         })
-        .then(() => console.log('Authentication process successful\n'))
+        .then(() => this.browserLog('Authentication process successful\n', true))
         // Close the page.
         .then(() => page.close())
         .catch((error) => {
-          console.log('Error: There was an error during authentication. See error below for more information.');
-          console.log(error);
+          this.browserLog('There was an error during authentication. See error below for more information.');
+          this.browserLog(error);
           process.exit(1);
         });
     });
   }
 
   /**
-   * Creates a directory
+   * Wrapper around the log util that adds the browser number to the message
    *
-   * @param {string} dir - The directory name.
+   * @param {string} m - The message to be logged.
+   * @param {boolean} isVerbose - Whether this message is verbose or not.
    */
-  static createDir(dir) {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-    }
-    return dir;
-  }
-
-  /**
-   * Splits an array into an array of chunks
-   *
-   * @param {array} arr - The array we want to create chunks from.
-   * @param {int} size - The chunk size.
-   * @return {array} - The chunks.
-   */
-  static getChunks(arr, size) {
-    const arrCopy = arr.slice(0);
-    const chunks = [];
-    while (arrCopy.length > 0) {
-      chunks.push(arrCopy.splice(0, size));
-    }
-    return chunks;
-  }
-
-  /**
-   * Sanitizes the url to use as a directory name
-   *
-   * @param {string} url - The page url.
-   * @return {string} - The sanitized directory name.
-   */
-  static urlToDirectoryName(url) {
-    return url.replace(/:\/\//g, '-').replace(/\//g, '%2F');
+  browserLog(m, isVerbose = false) {
+    // Prepend browser index to message
+    const message = `Browser #${this.options.browserIndex}: ${m}`;
+    const skipConsoleLog = isVerbose && !this.options.verbose;
+    log(this.options.logFile, message, skipConsoleLog);
   }
 
   /**
    * Initializes and processes all urls.
    */
   async start() {
-    // Create the directory where we will keep all the screenshots.
-
-    this.reportDirectory = ScreenshotGrabberPlus.createDir(`${ScreenshotGrabberPlus.createDir('./reports')}/${this.options.directory}`);
-
     // Launch the browser.
-    console.log('Starting program');
-    console.log(`Number of urls: ${this.urls.length}`);
-    console.log(`Batch size: ${this.options.batchSize}`);
-    console.log(`Number of batches: ${this.urlChunks.length}\n`);
-    this.browser = await puppeteer.launch({ headless: this.options.headless });
+    this.browserLog('Starting', true);
+    this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
 
     // If authetication information is present, authenticate it first.
     if (this.authentication) {
       await this.authenticate();
     }
 
-    // Capture start time.
-    const startTime = Date.now();
-
     // Process all urls.
     await this.processBatchsRecursive();
 
-    // Capture end time.
-    const endTime = Date.now();
-
-    // Display stats.
-    const totalTimeInSeconds = (endTime - startTime) / 1000;
-    const pagesPerMinute = this.urls.length / (totalTimeInSeconds / 60);
-    console.log(`\nTotal time: ${totalTimeInSeconds} seconds`);
-    console.log(`Speed: ${pagesPerMinute} URLs per minute`);
-
     // Close the browser.
-    console.log('Ending Program');
+    this.browserLog('Ending', true);
     await this.browser.close();
   }
 };
