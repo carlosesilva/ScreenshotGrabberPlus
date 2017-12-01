@@ -2,6 +2,28 @@ const { URL } = require('url');
 const fs = require('fs-extra');
 
 /**
+ * Returns a copy of the array with unique items only.
+ *
+ * @param {array} a - The array we want to remove duplicates from.
+ * @return {array} - A copy of the array with unique items only.
+ */
+function uniq(a) {
+  // Initialize the hashtable.
+  const seen = {};
+  // Filter the array.
+  return a.filter((item) => {
+    // If this item has already been seen before, filter it out.
+    if (Object.prototype.hasOwnProperty.call(seen, item)) {
+      return false;
+    }
+    // Add unique item to the hashtable.
+    seen[item] = true;
+    // Return true to keep the item.
+    return true;
+  });
+}
+
+/**
  * Reads urls from file into an array
  *
  * @param {string} urlsPath - The path to the file with the list of urls.
@@ -14,8 +36,11 @@ module.exports.readUrls = (urlsPath, verbose = false) => {
     .toString()
     .split('\n');
 
+  // Remove duplicates.
+  const uniqueUrls = uniq(rawUrls);
+
   // Filter list of urls by only keeping valid ones.
-  const filteredUrls = rawUrls.filter((url) => {
+  const filteredUrls = uniqueUrls.filter((url) => {
     // Ignore empty lines.
     if (url === '') {
       return false;
