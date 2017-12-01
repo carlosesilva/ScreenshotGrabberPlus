@@ -13,6 +13,7 @@ const options = require('./inc/cli-arguments');
 
 // Start main program.
 (async () => {
+  // Display program name.
   console.log(chalkRainbow('-----------------------'));
   console.log(chalkRainbow('Screenshot Grabber Plus'));
   console.log(chalkRainbow('-----------------------\n'));
@@ -22,8 +23,6 @@ const options = require('./inc/cli-arguments');
 
   // Construct log file path.
   options.logFile = `${options.reportDirectory}/log.txt`;
-
-  log(options.logFile, 'Starting main program\n');
 
   // Read urls from file.
   const urls = readUrls(options.urls, options.verbose);
