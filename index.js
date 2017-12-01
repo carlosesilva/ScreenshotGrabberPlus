@@ -1,5 +1,5 @@
 const cp = require('child_process');
-const { readUrls, getChunks } = require('./inc/utils');
+const { readUrls, getChunks, createDir } = require('./inc/utils');
 
 // Grab the options from the cli arguments passed in to this program.
 const options = require('./inc/cli-arguments');
@@ -16,6 +16,9 @@ console.log(options);
   // Divide urls into chunks for each subprocess/
   const processUrlChunkSize = Math.ceil(urls.length / options.numBrowsers);
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
+
+  // Create the directory where we will keep all the screenshots.
+  options.reportDirectory = createDir(`${createDir('./reports')}/${options.directory}`);
 
   // Report initial stats.
   console.log(`Number of urls: ${urls.length}`);

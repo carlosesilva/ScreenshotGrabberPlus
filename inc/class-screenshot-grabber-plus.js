@@ -71,7 +71,7 @@ module.exports = class ScreenshotGrabberPlus {
     return this.browser.newPage().then(async (page) => {
       // Create directory for this url.
       const pageDirectoryName = urlToDirectoryName(url);
-      const pageDirectoryPath = createDir(`${this.reportDirectory}/${pageDirectoryName}`);
+      const pageDirectoryPath = createDir(`${this.options.reportDirectory}/${pageDirectoryName}`);
 
       // Construct files paths.
       const consolePath = `${pageDirectoryPath}/console.txt`;
@@ -191,10 +191,6 @@ module.exports = class ScreenshotGrabberPlus {
    * Initializes and processes all urls.
    */
   async start() {
-    // Create the directory where we will keep all the screenshots.
-
-    this.reportDirectory = createDir(`${createDir('./reports')}/${this.options.directory}`);
-
     // Launch the browser.
     console.log(`Starting browser #${this.options.browserIndex}`);
     this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
