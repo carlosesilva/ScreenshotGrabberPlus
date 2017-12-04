@@ -104,6 +104,12 @@ process.on('SIGINT', () => {
     exit();
   });
 
+  // Sum up the total number of page errors from all the child processes.
+  const totalPageErrors = results.reduce(
+    (sum, result) => sum + result.payload.pageErrors.length,
+    0,
+  );
+
   // Capture end time.
   const endDate = new Date();
 
@@ -113,9 +119,6 @@ process.on('SIGINT', () => {
   // Calculate performance stats.
   const totalTimeInSeconds = (endDate.getTime() - startDate.getTime()) / 1000;
   const pagesPerMinute = urls.length / (totalTimeInSeconds / 60);
-
-  // Sum up the total number of page errors from all the child processes.
-  const totalPageErrors = results.reduce(result => result.payload.pageErrors.length);
 
   // Display performance stats
   log(options.logFile, '\n');
