@@ -4,7 +4,6 @@
 
 const commandLineArgs = require('command-line-args');
 const getUsage = require('command-line-usage');
-const { getValidDatePath } = require('./utils');
 
 // Define command line args accepted.
 const optionDefinitions = [

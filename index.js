@@ -16,7 +16,7 @@ const options = require('./inc/cli-arguments');
 const startDate = new Date();
 
 // If no report directory was specified use start date.
-if (!options.diretory) {
+if (!options.directory) {
   options.directory = getValidDatePath(startDate);
 }
 
