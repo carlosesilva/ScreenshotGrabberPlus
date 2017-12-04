@@ -4,12 +4,21 @@ const {
   readAuthenticationInfo,
   getChunks,
   createDir,
+  getValidDatePath,
   log,
   chalkRainbow,
 } = require('./inc/utils');
 
 // Grab the options from the cli arguments passed in to this program.
 const options = require('./inc/cli-arguments');
+
+// Capture start time.
+const startDate = new Date();
+
+// If no report directory was specified use start date.
+if (!options.diretory) {
+  options.directory = getValidDatePath(startDate);
+}
 
 // Keep track of all child processes we will be forking.
 const childProcesses = [];
@@ -42,6 +51,9 @@ process.on('SIGINT', () => {
   // Construct log file path.
   options.logFile = `${options.reportDirectory}/log.txt`;
 
+  // Log the start time.
+  log(options.logFile, `Start Time: ${startDate.toString()}`, true);
+
   // Read urls from file.
   const urls = readUrls(options.urls, options.verbose);
 
@@ -64,9 +76,6 @@ process.on('SIGINT', () => {
   log(options.logFile, `Batch size: ${options.batchSize}`);
   log(options.logFile, `Number of batches: ${Math.ceil(urls.length / options.batchSize)}`);
   log(options.logFile, `Number of concurent browsers: ${processUrlChunks.length}\n`);
-
-  // Capture start time.
-  const startTime = Date.now();
 
   // Start a new child process for each chunk.
   const childPromises = processUrlChunks.map((processUrlChunk, index) =>
@@ -96,10 +105,13 @@ process.on('SIGINT', () => {
   });
 
   // Capture end time.
-  const endTime = Date.now();
+  const endDate = new Date();
+
+  // Log end time
+  log(options.logFile, `\nEnd Time: ${endDate.toString()}`, true);
 
   // Calculate performance stats.
-  const totalTimeInSeconds = (endTime - startTime) / 1000;
+  const totalTimeInSeconds = (endDate.getTime() - startDate.getTime()) / 1000;
   const pagesPerMinute = urls.length / (totalTimeInSeconds / 60);
 
   // Sum up the total number of page errors from all the child processes.

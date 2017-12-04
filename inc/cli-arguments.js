@@ -11,7 +11,6 @@ const optionDefinitions = [
   {
     name: 'directory',
     type: String,
-    defaultValue: getValidDatePath(new Date()),
     description: 'The directory name to save the screenshots in. *Required',
   },
   {
