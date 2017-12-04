@@ -70,7 +70,7 @@ module.exports = class ScreenshotGrabberPlus {
 
           // Fetch page.
           await page
-            .goto(url, { waitUntil: 'networkidle2' })
+            .goto(url, { timeout: 60000, waitUntil: 'networkidle2' })
             // Grab screenshot.
             .then(() =>
               page.screenshot({
