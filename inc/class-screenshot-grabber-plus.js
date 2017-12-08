@@ -58,15 +58,23 @@ module.exports = class ScreenshotGrabberPlus {
 
           // Construct files paths.
           const consolePath = `${pageDirectoryPath}/console.txt`;
+          const errorPath = `${pageDirectoryPath}/error.txt`;
           const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
 
-          // Remove exisiting console file because we append to it so we don't want any previous stuff.
-          if (fs.existsSync(consolePath)) {
-            fs.unlinkSync(consolePath);
-          }
-
-          // Add event listener for console messages. Append it to a txt file.
+          // Add event listeners for console messages and errors.
+          // Append them to repective txt files.
           page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
+          page.on('pageerror', error => fs.appendFile(errorPath, `pageerror: ${error.stack}\n`));
+          page.on('response', (response) => {
+            if (!response.ok) {
+              fs.appendFile(errorPath, `response: ${response.status} ${response.url}\n`);
+            }
+          });
+          page.on('requestfailed', request =>
+            fs.appendFile(
+              errorPath,
+              `requestfailed: ${request.failure().errorText} ${request.url}\n`,
+            ));
 
           // Fetch page.
           await page
