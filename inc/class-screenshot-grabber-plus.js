@@ -76,6 +76,22 @@ module.exports = class ScreenshotGrabberPlus {
               `requestfailed: ${request.failure().errorText} ${request.url}\n`,
             ));
 
+          // If either view port width or height was specified.
+          if (this.options.viewportWidth || this.options.viewportHeight) {
+            // Get default viewport values.
+            const defaultViewport = page.viewport();
+            // Apply defaults in case only one of the options (width or height) was specified.
+            const viewportWidth = this.options.viewportWidth || defaultViewport.width;
+            const viewportHeight = this.options.viewportWidth || defaultViewport.height;
+            // Set the new viewport values.
+            await page
+              .setViewport({ width: viewportWidth, height: viewportHeight })
+              .catch((error) => {
+                this.browserLog(`There was an error setting the viewport size for ${url}`, true);
+                this.browserLog(error, true);
+              });
+          }
+
           // Fetch page.
           await page
             .goto(url, { waitUntil: 'networkidle0' })

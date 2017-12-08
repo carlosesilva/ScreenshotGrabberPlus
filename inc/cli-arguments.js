@@ -38,6 +38,16 @@ const optionDefinitions = [
     description: 'The number of browsers to use concurrently.',
   },
   {
+    name: 'viewportWidth',
+    type: Number,
+    description: 'Resize the viewport to the specified width in pixels.',
+  },
+  {
+    name: 'viewportHeight',
+    type: Number,
+    description: 'Resize the viewport to the specified height in pixels.',
+  },
+  {
     name: 'notHeadless',
     type: Boolean,
     defaultValue: false,
