@@ -54,6 +54,18 @@ const optionDefinitions = [
     description: "Don't use headless mode.",
   },
   {
+    name: 'skip-page-console-log',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Skip the capture of console messages found in page.',
+  },
+  {
+    name: 'skip-page-error-log',
+    type: Boolean,
+    defaultValue: false,
+    description: 'Skip the capture of console errors found in page.',
+  },
+  {
     name: 'verbose',
     type: Boolean,
     defaultValue: false,

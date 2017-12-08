@@ -61,20 +61,25 @@ module.exports = class ScreenshotGrabberPlus {
           const errorPath = `${pageDirectoryPath}/error.txt`;
           const screenshotPath = `${pageDirectoryPath}/screenshot.png`;
 
-          // Add event listeners for console messages and errors.
-          // Append them to repective txt files.
-          page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
-          page.on('pageerror', error => fs.appendFile(errorPath, `pageerror: ${error.stack}\n`));
-          page.on('response', (response) => {
-            if (!response.ok) {
-              fs.appendFile(errorPath, `response: ${response.status} ${response.url}\n`);
-            }
-          });
-          page.on('requestfailed', request =>
-            fs.appendFile(
-              errorPath,
-              `requestfailed: ${request.failure().errorText} ${request.url}\n`,
-            ));
+          // Log console messages.
+          if (!this.options['skip-page-console-log']) {
+            page.on('console', msg => fs.appendFile(consolePath, `${msg.text}\n`));
+          }
+
+          // Log console errors.
+          if (!this.options['skip-page-error-log']) {
+            page.on('pageerror', error => fs.appendFile(errorPath, `pageerror: ${error.stack}\n`));
+            page.on('response', (response) => {
+              if (!response.ok) {
+                fs.appendFile(errorPath, `response: ${response.status} ${response.url}\n`);
+              }
+            });
+            page.on('requestfailed', request =>
+              fs.appendFile(
+                errorPath,
+                `requestfailed: ${request.failure().errorText} ${request.url}\n`,
+              ));
+          }
 
           // If either view port width or height was specified.
           if (this.options.viewportWidth || this.options.viewportHeight) {
@@ -98,7 +103,9 @@ module.exports = class ScreenshotGrabberPlus {
             .catch((error) => {
               // If error is just a timeout, log it and continue.
               if (error.message === 'Error: Navigation Timeout Exceeded: 30000ms exceeded') {
-                fs.appendFile(errorPath, `goto: ${error.message}\n`);
+                if (!this.options['skip-page-error-log']) {
+                  fs.appendFile(errorPath, `goto: ${error.message}\n`);
+                }
               } else {
                 // If error is not a timeout, let the error be thrown.
                 throw error;
@@ -107,11 +114,14 @@ module.exports = class ScreenshotGrabberPlus {
             // Await a few seconds extras for things to finish loading.
             .then(() => page.waitFor(5000))
             // Grab screenshot.
-            .then(() =>
-              page.screenshot({
-                path: screenshotPath,
-                fullPage: true,
-              }))
+            .then(() => {
+              if (!this.options['skip-screenshot']) {
+                page.screenshot({
+                  path: screenshotPath,
+                  fullPage: true,
+                });
+              }
+            })
             // Close the page.
             .then(() => page.close())
             // If everything went ok, display a checkmark with the url.
