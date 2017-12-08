@@ -78,7 +78,18 @@ module.exports = class ScreenshotGrabberPlus {
 
           // Fetch page.
           await page
-            .goto(url, { timeout: 60000, waitUntil: 'networkidle2' })
+            .goto(url, { waitUntil: 'networkidle0' })
+            .catch((error) => {
+              // If error is just a timeout, log it and continue.
+              if (error.message === 'Error: Navigation Timeout Exceeded: 30000ms exceeded') {
+                fs.appendFile(errorPath, `goto: ${error.message}\n`);
+              } else {
+                // If error is not a timeout, let the error be thrown.
+                throw error;
+              }
+            })
+            // Await a few seconds extras for things to finish loading.
+            .then(() => page.waitFor(5000))
             // Grab screenshot.
             .then(() =>
               page.screenshot({
