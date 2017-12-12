@@ -114,9 +114,9 @@ module.exports = class ScreenshotGrabberPlus {
             // Await a few seconds extras for things to finish loading.
             .then(() => page.waitFor(5000))
             // Grab screenshot.
-            .then(() => {
+            .then(async () => {
               if (!this.options['skip-screenshot']) {
-                page.screenshot({
+                await page.screenshot({
                   path: screenshotPath,
                   fullPage: true,
                 });
