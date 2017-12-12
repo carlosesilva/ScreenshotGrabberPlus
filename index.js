@@ -58,11 +58,11 @@ process.on('SIGINT', () => {
   const urls = readUrls(options.urls, options.verbose);
 
   // Divide urls into chunks for each subprocess
-  // Since we don't want the chunk size to be smaller than options.batchSize
-  // We will use the bigger of urls.length/numBrowsers and batchSize for the chunk size.
+  // Since we don't want the chunk size to be smaller than options['max-tabs']
+  // We will use the bigger of urls.length/max-browsers and max-tabs for the chunk size.
   const processUrlChunkSize = Math.max(
-    Math.ceil(urls.length / options.numBrowsers),
-    options.batchSize,
+    Math.ceil(urls.length / options['max-browsers']),
+    options['max-tabs'],
   );
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
 
@@ -73,8 +73,8 @@ process.on('SIGINT', () => {
 
   // Report initial stats.
   log(options.logFile, `Number of urls: ${urls.length}`);
-  log(options.logFile, `Batch size: ${options.batchSize}`);
-  log(options.logFile, `Number of batches: ${Math.ceil(urls.length / options.batchSize)}`);
+  log(options.logFile, `Batch size: ${options['max-tabs']}`);
+  log(options.logFile, `Number of batches: ${Math.ceil(urls.length / options['max-tabs'])}`);
   log(options.logFile, `Number of concurent browsers: ${processUrlChunks.length}\n`);
 
   // Start a new child process for each chunk.

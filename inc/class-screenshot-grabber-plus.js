@@ -21,7 +21,7 @@ module.exports = class ScreenshotGrabberPlus {
     this.urls = urls;
 
     // Break list of urls into chunks.
-    this.urlChunks = getChunks(this.urls, this.options.batchSize);
+    this.urlChunks = getChunks(this.urls, this.options['max-tabs']);
 
     // Initialize next chunk index to zero.
     this.nextChunk = 0;
@@ -82,12 +82,12 @@ module.exports = class ScreenshotGrabberPlus {
           }
 
           // If either view port width or height was specified.
-          if (this.options.viewportWidth || this.options.viewportHeight) {
+          if (this.options['viewport-width'] || this.options['viewport-height']) {
             // Get default viewport values.
-            const defaultViewport = page.viewport();
+            const defaultViewport = await page.viewport();
             // Apply defaults in case only one of the options (width or height) was specified.
-            const viewportWidth = this.options.viewportWidth || defaultViewport.width;
-            const viewportHeight = this.options.viewportWidth || defaultViewport.height;
+            const viewportWidth = this.options['viewport-width'] || defaultViewport.width;
+            const viewportHeight = this.options['viewport-height'] || defaultViewport.height;
             // Set the new viewport values.
             await page
               .setViewport({ width: viewportWidth, height: viewportHeight })
@@ -258,7 +258,7 @@ module.exports = class ScreenshotGrabberPlus {
   async start() {
     // Launch the browser.
     this.browserLog('Starting', true);
-    this.browser = await puppeteer.launch({ headless: !this.options.notHeadless });
+    this.browser = await puppeteer.launch({ headless: !this.options['not-headless'] });
 
     // If authentication information is present, authenticate it first.
     if (this.authentication) {
