@@ -7,7 +7,7 @@
   - [authentication-sample.json](#authentication-samplejson)
 ## Requirements
 
-* Node.js v8.x or higher
+* Node.js v8.3 or higher
 
 ## How to use
 
