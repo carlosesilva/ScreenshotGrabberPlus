@@ -126,4 +126,4 @@ process.on('SIGINT', () => {
   log(options.logFile, `Speed: ${pagesPerMinute.toFixed(2)} URLs per minute`);
   log(options.logFile, `Total number of page failures: ${totalPageErrors}`);
   console.log(`See the log file for more information: ${options.logFile}`);
-})();
+})().catch(error => log(options.logFile, error));
