@@ -1,10 +1,27 @@
 # ScreenshotGrabberPlus (name can be changed)
+Capture screenshots and console messages for multiple urls.
+
 ## Table of contents
+- [What does it do](#what-does-it-do)
 - [Requirements](#requirements)
 - [How to use](#how-to-use)
 - [Parameters](#parameters)
 - [Authentication](#authentication)
   - [authentication-sample.json](#authentication-samplejson)
+
+## What does it do
+You give a  .txt file with a list of urls to the program and for each url it will:
+- Open the url in a headless chrome browser instance and wait for it load.
+- Capture a screenshot into a .png file.
+- Capture the contents of the browser console into a .txt file.
+
+The results can be found inside the reports folder.
+
+It is able to achieve fast speeds by loading the urls into multiple tabs inside multiple browsers at the same time. (This can be hardware intensive but you can specify limits for the number of tabs and browsers to best fit your computer's capabilities).
+
+It is also capable of authenticating before visiting the urls so that you can capture pages that are not open to the public. See [authentication](#authentication) below for more information on that.
+
+
 ## Requirements
 
 * Node.js v8.3 or higher
@@ -44,7 +61,7 @@ $ node index.js --urls=urls.txt
 | ----------------------- | -------------------------------------------------------------------------------------------- | ----------------- |
 | `directory`             | The directory name to save the screenshots in.                                               | Current date time |
 | `urls`                  | Path to file with the list of urls                                                           | `'urls.txt'`      |
-| `authentication`        | Path to the authentication file. See more info about [authentication](#Authentication) below | Not set           |
+| `authentication`        | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
 | `max-tabs`              | The maximum number of tabs allowed to open at the same time per browser.                     | `5`               |
 | `max-browsers`          | The maximum number of browsers instances allowed to open at the same time.                   | `4`               |
 | `viewport-width`        | Specify a custom viewport width in pixels.                                                   | 800               |
