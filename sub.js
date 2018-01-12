@@ -3,7 +3,7 @@
  */
 
 // Require the ScreenshotGrabberPlus class.
-const ScreenshotGrabberPlus = require('./inc/class-screenshot-grabber-plus');
+const ScreenshotGrabberPlus = require('./lib/class-screenshot-grabber-plus');
 
 /**
  * Start subroutine

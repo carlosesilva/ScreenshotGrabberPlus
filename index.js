@@ -7,10 +7,10 @@ const {
   getValidDatePath,
   log,
   chalkRainbow,
-} = require('./inc/utils');
+} = require('./lib/utils');
 
 // Grab the options from the cli arguments passed in to this program.
-const options = require('./inc/cli-arguments');
+const options = require('./lib/cli-arguments');
 
 // Capture start time.
 const startDate = new Date();
