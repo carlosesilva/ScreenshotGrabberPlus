@@ -73,9 +73,18 @@ process.on('SIGINT', () => {
 
   // Report initial stats.
   log(options.logFile, `Number of urls: ${urls.length}`);
-  log(options.logFile, `Batch size: ${options['max-tabs']}`);
-  log(options.logFile, `Number of batches: ${Math.ceil(urls.length / options['max-tabs'])}`);
-  log(options.logFile, `Number of concurent browsers: ${processUrlChunks.length}\n`);
+  log(options.logFile, `Batch size: ${options['max-tabs']}`, !options.verbose);
+  log(
+    options.logFile,
+    `Number of batches: ${Math.ceil(urls.length / options['max-tabs'])}`,
+    !options.verbose,
+  );
+  log(
+    options.logFile,
+    `Number of concurent browsers: ${processUrlChunks.length}`,
+    !options.verbose,
+  );
+  log(options.logFile, '\n');
 
   // Start a new child process for each chunk.
   const childPromises = processUrlChunks.map((processUrlChunk, index) =>
