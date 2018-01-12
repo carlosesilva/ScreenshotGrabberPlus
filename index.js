@@ -101,6 +101,7 @@ process.on('SIGINT', () => {
   // Wait for all child promisses to complete.
   const results = await Promise.all(childPromises).catch((error) => {
     log(options.logFile, 'There was an error within one of the child processes.');
+    log(options.logFile, error);
     exit();
   });
 
