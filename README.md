@@ -1,5 +1,5 @@
 # ScreenshotGrabberPlus (name can be changed)
-Capture screenshots and console messages for multiple urls.
+Capture screenshots and console messages for multiple urls. You can also compare 2 sets of data to find any changes.
 
 ## Table of contents
 - [What does it do](#what-does-it-do)
@@ -8,6 +8,9 @@ Capture screenshots and console messages for multiple urls.
 - [Parameters](#parameters)
 - [Authentication](#authentication)
   - [authentication-sample.json](#authentication-samplejson)
+- [Comparing 2 reports](#comparing-2-reports)
+- [Tips on generating list of URLS](#tips-on-generating-list-of-urls)
+- [Changelog](#changelog)
 
 ## What does it do
 You give a  .txt file with a list of urls to the program and for each url it will:
@@ -25,6 +28,7 @@ It is also capable of authenticating before visiting the urls so that you can ca
 ## Requirements
 
 * Node.js v8.3 or higher
+* ImageMagick (only required for the [compare functionality](#comparing-2-reports))
 
 ## How to use
 
@@ -95,3 +99,48 @@ The browser will try to authenticate first and when it succeeds, it will start p
 | `successSelector`   | The selector to target an element that if found it confirms the authentication was successful | body.authenticated   |
 | `user`              | The authentication username                                                                   | username             |
 | `pass`              | The authentication password                                                                   | password             |
+
+
+## Comparing 2 reports
+
+You can compare two reports to find any changes to pages that may have occured after some action such as updating your CMS, updating a NPM package or even an event like the Y2k.
+
+Use the [compare.sh](/compare.sh) script to visualy compare the screenshots and diff the console messages/errors.
+
+```
+$ bash compare.sh <path/to/report1> <path/to/report2>
+```
+
+### Example:
+```
+$ node index.js --directory 1999
+$ node index.js --directory 2000
+$ bash compare.sh ./report/1999 ./report/2000
+```
+
+
+Note: You need to have [ImageMagick](https://www.imagemagick.org) installed on your computer. The easiest way to install on a mac is to use [Homebrew](http://brew.sh/)
+
+```
+$ brew install imagemagick
+```
+
+## Tips on generating list of URLS
+### WordPress
+
+It is easy to generate a list of URLs for a WordPress site through [wp-cli](http://wp-cli.org/).
+
+```
+# List post types registered on a site
+wp --url=www.example.com/ post-type list
+# List permalinks for the found post types.
+wp --url=www.example.com/ post list --fields=url --post_type=post,page --post_status=publish --format=csv | tail -n +2
+```
+
+### Google Analytics
+
+To get a list of popular sites or URLs, check the Google Analytics account under Reports > Behavior > Content Drilldown and use Export into CSV. Then copy the list of urls from the .csv file into a .txt file (one url per line).
+
+## Changelog
+### v0.2.0
+Added script to compare 2 sets of data.
