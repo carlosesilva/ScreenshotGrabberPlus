@@ -164,6 +164,11 @@ To get a list of popular sites or URLs, check the Google Analytics account under
 
 ## Changelog
 
+### v0.3.0
+
+Added option to enter authentication password via a secure prompt
+Added option to authenticate by cookie
+
 ### v0.2.0
 
 Added script to compare 2 sets of data.
