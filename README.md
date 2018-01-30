@@ -83,7 +83,7 @@ $ node index.js --urls=urls.txt
 
 This tool is able to authenticate via a simple username/password form page.
 
-For it to work, duplicate the [authentication-sample.json](/authentication-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the auth parameter
+For it to work, duplicate either the [auth-by-login-sample.json](/auth-by-login-sample.json) or [auth-by-cookie-sample.json](/auth-by-cookie-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the auth parameter:
 
 ```
 node index.js --auth authentication.json
@@ -93,7 +93,13 @@ The browser will try to authenticate first and when it succeeds, it will start p
 
 ### Authentication Methods
 
-* login (example: [auth-by-login-sample.json](/auth-by-login.sample.json))
+There are 2 methods of authentication available: login and cookie.
+
+#### Auth by login
+
+This method attempts to authenticate by automating the process of entering the username and password into a login form.
+
+Sample file: [auth-by-login-sample.json](/auth-by-login-sample.json)
 
 | Property            | Description                                                                                                | Example              |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------- |
@@ -105,11 +111,15 @@ The browser will try to authenticate first and when it succeeds, it will start p
 | `user`              | The authentication username                                                                                | username             |
 | `pass`              | The authentication password (Note: you may omit this property and you will be prompted for it at runtime ) | password             |
 
-* cookie (example: [auth-by-cookie-sample.json](/auth-by-cookie.sample.json))
+#### Auth by cookie
 
-| Property  | Description                                                                                                                                                                  | Example                                                                         |
-| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `cookies` | An array of cookie objects. See [page.setCookie](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) at the puppeteer docs for more info | `[{"name": "mycookie", "value": "mycookievalue", "url": "http://example.com"}]` |
+This method sets the authentication cookies that you specify in the `.json` file.
+
+Sample file: [auth-by-cookie-sample.json](/auth-by-cookie-sample.json)
+
+| Property  | Description                                                                                                                                                                                               | Example                                                                         |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `cookies` | An array of cookie objects. See [page.setCookie](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) over at the puppeteer docs for more info about the cookie object | `[{"name": "mycookie", "value": "mycookievalue", "url": "http://example.com"}]` |
 
 ## Comparing 2 reports
 
