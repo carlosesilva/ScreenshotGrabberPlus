@@ -9,7 +9,7 @@ Capture screenshots and console messages for multiple urls. You can also compare
 * [How to use](#how-to-use)
 * [Parameters](#parameters)
 * [Authentication](#authentication)
-  * [authentication-sample.json](#authentication-samplejson)
+  * [Authentication Methods](#authentication-methods)
 * [Comparing 2 reports](#comparing-2-reports)
 * [Tips on generating list of URLS](#tips-on-generating-list-of-urls)
 * [Changelog](#changelog)
@@ -68,7 +68,7 @@ $ node index.js --urls=urls.txt
 | ----------------------- | -------------------------------------------------------------------------------------------- | ----------------- |
 | `directory`             | The directory name to save the screenshots in.                                               | Current date time |
 | `urls`                  | Path to file with the list of urls                                                           | `'urls.txt'`      |
-| `authentication`        | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
+| `auth`                  | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
 | `max-tabs`              | The maximum number of tabs allowed to open at the same time per browser.                     | `5`               |
 | `max-browsers`          | The maximum number of browsers instances allowed to open at the same time.                   | `4`               |
 | `viewport-width`        | Specify a custom viewport width in pixels.                                                   | 800               |
@@ -81,17 +81,25 @@ $ node index.js --urls=urls.txt
 
 ## Authentication
 
-This tool is able to authenticate via a simple username/password form page.
+This tool is able to authenticate via a simple username/password form page or by cookies.
 
-For it to work, duplicate the [authentication-sample.json](/authentication-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the authentication parameter
+For it to work, duplicate either the [auth-by-login-sample.json](/auth-by-login-sample.json) or [auth-by-cookie-sample.json](/auth-by-cookie-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the auth parameter:
 
 ```
-node index.js --authentication authentication.json
+node index.js --auth authentication.json
 ```
 
 The browser will try to authenticate first and when it succeeds, it will start processing the list of urls.
 
-### authentication-sample.json
+### Authentication Methods
+
+There are 2 methods of authentication available: login and cookie.
+
+#### Auth by login
+
+This method attempts to authenticate by automating the process of entering the username and password into a login form.
+
+Sample file: [auth-by-login-sample.json](/auth-by-login-sample.json)
 
 | Property            | Description                                                                                                | Example              |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------- |
@@ -102,6 +110,16 @@ The browser will try to authenticate first and when it succeeds, it will start p
 | `successSelector`   | The selector to target an element that if found it confirms the authentication was successful              | body.authenticated   |
 | `user`              | The authentication username                                                                                | username             |
 | `pass`              | The authentication password (Note: you may omit this property and you will be prompted for it at runtime ) | password             |
+
+#### Auth by cookie
+
+This method sets the authentication cookies that you specify in the `.json` file.
+
+Sample file: [auth-by-cookie-sample.json](/auth-by-cookie-sample.json)
+
+| Property  | Description                                                                                                                                                                                               | Example                                                                         |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `cookies` | An array of cookie objects. See [page.setCookie](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) over at the puppeteer docs for more info about the cookie object | `[{"name": "mycookie", "value": "mycookievalue", "url": "http://example.com"}]` |
 
 ## Comparing 2 reports
 

@@ -67,8 +67,8 @@ process.on('SIGINT', () => {
   const processUrlChunks = getChunks(urls, processUrlChunkSize);
 
   // If authentication file is specified, add the info to the options object.
-  if (options.authentication) {
-    options.authenticationInfo = await readAuthenticationInfo(options.authentication);
+  if (options.auth) {
+    options.authenticationInfo = await readAuthenticationInfo(options.auth);
   }
 
   // Report initial stats.
