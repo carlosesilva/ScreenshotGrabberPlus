@@ -1,29 +1,32 @@
 # ScreenshotGrabberPlus (name can be changed)
+
 Capture screenshots and console messages for multiple urls. You can also compare 2 sets of data to find any changes.
 
 ## Table of contents
-- [What does it do](#what-does-it-do)
-- [Requirements](#requirements)
-- [How to use](#how-to-use)
-- [Parameters](#parameters)
-- [Authentication](#authentication)
-  - [authentication-sample.json](#authentication-samplejson)
-- [Comparing 2 reports](#comparing-2-reports)
-- [Tips on generating list of URLS](#tips-on-generating-list-of-urls)
-- [Changelog](#changelog)
+
+* [What does it do](#what-does-it-do)
+* [Requirements](#requirements)
+* [How to use](#how-to-use)
+* [Parameters](#parameters)
+* [Authentication](#authentication)
+  * [authentication-sample.json](#authentication-samplejson)
+* [Comparing 2 reports](#comparing-2-reports)
+* [Tips on generating list of URLS](#tips-on-generating-list-of-urls)
+* [Changelog](#changelog)
 
 ## What does it do
-You give a  .txt file with a list of urls to the program and for each url it will:
-- Open the url in a headless chrome browser instance and wait for it load.
-- Capture a screenshot into a .png file.
-- Capture the contents of the browser console into a .txt file.
+
+You give a .txt file with a list of urls to the program and for each url it will:
+
+* Open the url in a headless chrome browser instance and wait for it load.
+* Capture a screenshot into a .png file.
+* Capture the contents of the browser console into a .txt file.
 
 The results can be found inside the reports folder.
 
 It is able to achieve fast speeds by loading the urls into multiple tabs inside multiple browsers at the same time. (This can be hardware intensive but you can specify limits for the number of tabs and browsers to best fit your computer's capabilities).
 
 It is also capable of authenticating before visiting the urls so that you can capture pages that are not open to the public. See [authentication](#authentication) below for more information on that.
-
 
 ## Requirements
 
@@ -90,16 +93,15 @@ The browser will try to authenticate first and when it succeeds, it will start p
 
 ### authentication-sample.json
 
-| Property            | Description                                                                                   | Example              |
-| ------------------- | --------------------------------------------------------------------------------------------- | -------------------- |
-| `authenticationUrl` | The url for the authentication form                                                           | https://example.com  |
-| `userFieldSelector` | The selector to target the username field                                                     | input[name=user]     |
-| `passFieldSelector` | The selector to target the password field                                                     | input[name=password] |
-| `submitSelector`    | The selector to target the submit button                                                      | input[type=submit]   |
-| `successSelector`   | The selector to target an element that if found it confirms the authentication was successful | body.authenticated   |
-| `user`              | The authentication username                                                                   | username             |
-| `pass`              | The authentication password                                                                   | password             |
-
+| Property            | Description                                                                                                | Example              |
+| ------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------- |
+| `authenticationUrl` | The url for the authentication form                                                                        | https://example.com  |
+| `userFieldSelector` | The selector to target the username field                                                                  | input[name=user]     |
+| `passFieldSelector` | The selector to target the password field                                                                  | input[name=password] |
+| `submitSelector`    | The selector to target the submit button                                                                   | input[type=submit]   |
+| `successSelector`   | The selector to target an element that if found it confirms the authentication was successful              | body.authenticated   |
+| `user`              | The authentication username                                                                                | username             |
+| `pass`              | The authentication password (Note: you may omit this property and you will be prompted for it at runtime ) | password             |
 
 ## Comparing 2 reports
 
@@ -112,12 +114,12 @@ $ bash compare.sh <path/to/report1> <path/to/report2>
 ```
 
 ### Example:
+
 ```
 $ node index.js --directory 1999
 $ node index.js --directory 2000
 $ bash compare.sh ./report/1999 ./report/2000
 ```
-
 
 Note: You need to have [ImageMagick](https://www.imagemagick.org) installed on your computer. The easiest way to install on a mac is to use [Homebrew](http://brew.sh/)
 
@@ -126,6 +128,7 @@ $ brew install imagemagick
 ```
 
 ## Tips on generating list of URLS
+
 ### WordPress
 
 It is easy to generate a list of URLs for a WordPress site through [wp-cli](http://wp-cli.org/).
@@ -142,5 +145,7 @@ wp --url=www.example.com/ post list --fields=url --post_type=post,page --post_st
 To get a list of popular sites or URLs, check the Google Analytics account under Reports > Behavior > Content Drilldown and use Export into CSV. Then copy the list of urls from the .csv file into a .txt file (one url per line).
 
 ## Changelog
+
 ### v0.2.0
+
 Added script to compare 2 sets of data.

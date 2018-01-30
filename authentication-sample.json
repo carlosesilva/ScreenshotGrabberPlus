@@ -1,13 +1,8 @@
-/**
- * Rename this file to authentication.json and enter the proper information below.
- * When starting the program add the argument --authentication=authentication.json
- */
 {
   "authenticationUrl": "https://example.com",
   "userFieldSelector": "input[name=user]",
   "passFieldSelector": "input[name=password]",
   "submitSelector": "input[type=submit]",
   "successSelector": "body.authenticated",
-  "user": "username",
-  "pass": "password"
+  "user": "username"
 }
