@@ -9,7 +9,7 @@ Capture screenshots and console messages for multiple urls. You can also compare
 * [How to use](#how-to-use)
 * [Parameters](#parameters)
 * [Authentication](#authentication)
-  * [authentication-sample.json](#authentication-samplejson)
+  * [Authentication Methods](#authentication-methods)
 * [Comparing 2 reports](#comparing-2-reports)
 * [Tips on generating list of URLS](#tips-on-generating-list-of-urls)
 * [Changelog](#changelog)
