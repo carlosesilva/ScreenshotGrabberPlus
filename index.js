@@ -68,7 +68,7 @@ process.on('SIGINT', () => {
 
   // If authentication file is specified, add the info to the options object.
   if (options.authentication) {
-    options.authenticationInfo = readAuthenticationInfo(options.authentication);
+    options.authenticationInfo = await readAuthenticationInfo(options.authentication);
   }
 
   // Report initial stats.
