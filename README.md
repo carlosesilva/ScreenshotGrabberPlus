@@ -68,7 +68,7 @@ $ node index.js --urls=urls.txt
 | ----------------------- | -------------------------------------------------------------------------------------------- | ----------------- |
 | `directory`             | The directory name to save the screenshots in.                                               | Current date time |
 | `urls`                  | Path to file with the list of urls                                                           | `'urls.txt'`      |
-| `authentication`        | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
+| `auth`                  | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
 | `max-tabs`              | The maximum number of tabs allowed to open at the same time per browser.                     | `5`               |
 | `max-browsers`          | The maximum number of browsers instances allowed to open at the same time.                   | `4`               |
 | `viewport-width`        | Specify a custom viewport width in pixels.                                                   | 800               |
@@ -83,10 +83,10 @@ $ node index.js --urls=urls.txt
 
 This tool is able to authenticate via a simple username/password form page.
 
-For it to work, duplicate the [authentication-sample.json](/authentication-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the authentication parameter
+For it to work, duplicate the [authentication-sample.json](/authentication-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the auth parameter
 
 ```
-node index.js --authentication authentication.json
+node index.js --auth authentication.json
 ```
 
 The browser will try to authenticate first and when it succeeds, it will start processing the list of urls.
