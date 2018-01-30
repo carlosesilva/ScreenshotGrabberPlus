@@ -81,7 +81,7 @@ $ node index.js --urls=urls.txt
 
 ## Authentication
 
-This tool is able to authenticate via a simple username/password form page.
+This tool is able to authenticate via a simple username/password form page or by cookies.
 
 For it to work, duplicate either the [auth-by-login-sample.json](/auth-by-login-sample.json) or [auth-by-cookie-sample.json](/auth-by-cookie-sample.json) file, replace the dummy information with your information and point to it when starting the program by using the auth parameter:
 
