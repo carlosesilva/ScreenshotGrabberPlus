@@ -1,0 +1,21 @@
+{
+  "method": "cookie",
+  "cookies": [
+    {
+      "name": "mySimpleCookie",
+      "value": "someValue",
+      "url": "http://example.com"
+    },
+    {
+      "name": "aMoreSpecificCookie",
+      "value": "someOtherValue",
+      "url": "http://differentsite.com",
+      "domain": ".differentsite.com",
+      "path": "/",
+      "expires": -1,
+      "httpOnly": false,
+      "secure": false,
+      "session": true
+    }
+  ]
+}

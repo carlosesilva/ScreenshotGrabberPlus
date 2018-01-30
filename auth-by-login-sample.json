@@ -1,4 +1,5 @@
 {
+  "method": "login",
   "authenticationUrl": "https://example.com",
   "userFieldSelector": "input[name=user]",
   "passFieldSelector": "input[name=password]",

@@ -91,7 +91,9 @@ node index.js --auth authentication.json
 
 The browser will try to authenticate first and when it succeeds, it will start processing the list of urls.
 
-### authentication-sample.json
+### Authentication Methods
+
+* login (example: [auth-by-login-sample.json](/auth-by-login.sample.json))
 
 | Property            | Description                                                                                                | Example              |
 | ------------------- | ---------------------------------------------------------------------------------------------------------- | -------------------- |
@@ -102,6 +104,12 @@ The browser will try to authenticate first and when it succeeds, it will start p
 | `successSelector`   | The selector to target an element that if found it confirms the authentication was successful              | body.authenticated   |
 | `user`              | The authentication username                                                                                | username             |
 | `pass`              | The authentication password (Note: you may omit this property and you will be prompted for it at runtime ) | password             |
+
+* cookie (example: [auth-by-cookie-sample.json](/auth-by-cookie.sample.json))
+
+| Property  | Description                                                                                                                                                                  | Example                                                                         |
+| --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `cookies` | An array of cookie objects. See [page.setCookie](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagesetcookiecookies) at the puppeteer docs for more info | `[{"name": "mycookie", "value": "mycookievalue", "url": "http://example.com"}]` |
 
 ## Comparing 2 reports
 
