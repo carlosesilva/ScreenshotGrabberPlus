@@ -10,19 +10,35 @@ const ScreenshotGrabberPlus = require('./lib/class-screenshot-grabber-plus');
  *
  * @param {object} options - The program options.
  * @param {array} urls - The urls to be processed.
+ * @return {Promise}
  */
-async function start(options, urls) {
+function start(options, urls) {
   // Instantiate the ScreenshotGrabberPlus class with the options and urls.
   const screenshotGrabberPlus = new ScreenshotGrabberPlus(options, urls);
   // Start async processing and wait for it to finish.
-  const result = await screenshotGrabberPlus.start();
-  // Send a message to parent saying we are done.
-  process.send({
-    type: 'child_done',
-    payload: result,
-  });
-  // Exit the child process
-  process.exit();
+  return screenshotGrabberPlus
+    .start()
+    .then((result) => {
+      // Send a message to parent saying we are done.
+      process.send({
+        type: 'child_done',
+        payload: { browserIndex: options.browserIndex, result },
+      });
+    })
+    .then(() => {
+      // Exit the child process
+      process.exit();
+    })
+    .catch((error) => {
+      // Send a message to parent saying there was an error.
+      process.send({
+        type: 'child_error',
+        payload: { browserIndex: options.browserIndex, error: error.message },
+      });
+
+      // Exit the child process with error code.
+      process.exit(1);
+    });
 }
 
 // Wait for message from parent process to start the url processing.
