@@ -29,7 +29,7 @@ const childProcesses = [];
 function exit() {
   console.log('\nClosing all browsers and exiting');
   console.log(`See the log file for more information: ${options.logFile}`);
-  childProcesses.forEach(child => child.kill('SIGINT'));
+  childProcesses.forEach(child => child.kill('SIGKILL'));
   process.exit(1);
 }
 
@@ -86,6 +86,26 @@ process.on('SIGINT', () => {
   );
   log(options.logFile, '\n');
 
+  /**
+   *
+   * @param {object} message - The message sent by the child process.
+   * @param {function} resolve - The childPromise's resolve function.
+   * @param {function} reject - The childPromise's reject function.
+   */
+  const handleChildMessage = (message, resolve, reject) => {
+    switch (message.type) {
+      case 'child_done':
+        resolve(message.payload.result);
+        break;
+      case 'child_error':
+        reject(message.payload.error);
+        break;
+      default:
+        reject('Child process sent a message of unknown type');
+        break;
+    }
+  };
+
   // Start a new child process for each chunk.
   const childPromises = processUrlChunks.map((processUrlChunk, index) =>
     new Promise((resolve, reject) => {
@@ -98,7 +118,9 @@ process.on('SIGINT', () => {
       // Listen for child events.
       child.on('error', reject);
       child.on('exit', reject);
-      child.on('message', resolve);
+      child.on('message', (message) => {
+        handleChildMessage(message, resolve, reject);
+      });
 
       // Send message to start processing of urls.
       child.send({
@@ -109,16 +131,13 @@ process.on('SIGINT', () => {
 
   // Wait for all child promisses to complete.
   const results = await Promise.all(childPromises).catch((error) => {
-    log(options.logFile, 'There was an error within one of the child processes.');
+    log(options.logFile, '\nThere was an error within one of the child processes.');
     log(options.logFile, error);
     exit();
   });
 
   // Sum up the total number of page errors from all the child processes.
-  const totalPageErrors = results.reduce(
-    (sum, result) => sum + result.payload.pageErrors.length,
-    0,
-  );
+  const totalPageErrors = results.reduce((sum, result) => sum + result.pageErrors.length, 0);
 
   // Capture end time.
   const endDate = new Date();
