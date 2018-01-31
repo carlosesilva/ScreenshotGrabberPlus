@@ -29,7 +29,7 @@ const childProcesses = [];
 function exit() {
   console.log('\nClosing all browsers and exiting');
   console.log(`See the log file for more information: ${options.logFile}`);
-  childProcesses.forEach(child => child.kill('SIGINT'));
+  childProcesses.forEach(child => child.kill('SIGKILL'));
   process.exit(1);
 }
 
