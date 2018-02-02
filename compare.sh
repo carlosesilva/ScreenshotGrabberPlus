@@ -61,16 +61,15 @@ diffconsole() {
   second=$2
   differences=$3
   encoded=$4
-
-  differencefile=$differences/$encoded/console.diff
+  file=$5
 
   # Diff the text files in both directories
-  diff -Nau --exclude='*.png' $first/$encoded $second/$encoded > $differencefile
+  diff -Nau $first/$encoded/$file.txt $second/$encoded/$file.txt | tail -n +4 > $differences/$encoded/$file.diff
 
   # If the diff file is empty, remove it.
-  if [ ! -s $differencefile ]
+  if [ ! -s $differences/$encoded/$file.diff ]
   then
-    rm $differencefile
+    rm $differences/$encoded/$file.diff
   fi
 }
 
@@ -128,7 +127,8 @@ for urlpath in $(find $first -type d -maxdepth 1 -mindepth 1) ; do
   comparescreenshots $first $second $differences $encoded
 
   # Compare the console messages/errors for this url
-  diffconsole $first $second $differences $encoded
+  # diffconsole $first $second $differences $encoded 'console'
+  diffconsole $first $second $differences $encoded 'error'
 
   # Remove url directory from difference directory if it is empty
   if [ ! "$(ls -A $differences/$encoded)" ]

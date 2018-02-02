@@ -23,11 +23,27 @@ const getConsoleDiff = pagePath =>
   fs
     .readFile(`${pagePath}/console.diff`, 'utf8')
     .then((diff) => {
-      const html = `<pre><code class="diff">${escapeHtml(diff)}</code></pre>`;
+      const html = `<div class="console-diff"><h4>Console Diff</h4><pre><code class="diff">${escapeHtml(diff)}</code></pre></div>`;
       return html;
     })
     .catch((err) => {
-      console.error(err);
+      if (err.code !== 'ENOENT') {
+        console.error(err);
+      }
+      return '';
+    });
+
+const getErrorDiff = pagePath =>
+  fs
+    .readFile(`${pagePath}/error.diff`, 'utf8')
+    .then((diff) => {
+      const html = `<div class="error-diff"><h4>Error Diff</h4><pre><code class="diff">${escapeHtml(diff)}</code></pre></div>`;
+      return html;
+    })
+    .catch((err) => {
+      if (err.code !== 'ENOENT') {
+        console.error(err);
+      }
       return '';
     });
 
@@ -35,28 +51,24 @@ const getScreenshotDiff = pagePath =>
   fs
     .access(`${pagePath}/screenshot.png`)
     .then(() => {
-      const html = `<a href="${pagePath}/screenshot.png" target="_blank" ><img src="${pagePath}/screenshot.png" /></a>`;
+      const html = `<div class="screenshot-diff"><h4>Screenshot Diff</h4><p><a href="${pagePath}/screenshot.png" target="_blank" ><img src="${pagePath}/screenshot.png" /></a></p></div>`;
       return html;
     })
     .catch((err) => {
-      console.error(err);
+      if (err.code !== 'ENOENT') {
+        console.error(err);
+      }
       return '';
     });
 
 const getReport = (pagePath) => {
-  const screenshotDiff = getScreenshotDiff(pagePath).then((img) => {
-    if (img !== '') {
-      return `<div class="screenshot-diff"><h4>Screenshot Diff</h4><p>${img}</p></div>`;
-    }
-    return '';
-  });
-  const consoleDiff = getConsoleDiff(pagePath).then((code) => {
-    if (code !== '') {
-      return `<div class="console-diff"><h4>Console Diff</h4>${code}</div>`;
-    }
-    return '';
-  });
-  const report = Promise.all([screenshotDiff, consoleDiff])
+  const diffPromises = [
+    getScreenshotDiff(pagePath),
+    getConsoleDiff(pagePath),
+    getErrorDiff(pagePath),
+  ];
+
+  const report = Promise.all(diffPromises)
     .then((diffs) => {
       const diff = diffs.join('');
       if (diff !== '') {
@@ -88,6 +100,16 @@ Promise.all(reportPromises)
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Document</title>
+        <style>
+          body {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 15px;
+          }
+          img {
+            max-width: 100%;
+          }
+        </style>
       </head>
       <body>  
         ${reports.join('')}
