@@ -120,9 +120,9 @@ Promise.all(reportPromises)
       </body>
       </html>
     `;
-    return fs.writeFile(`${sourcePath}/index.html`, reportHtml);
+    return fs.writeFile(`${sourcePath}/report.html`, reportHtml);
   })
   .then(() => {
-    console.log(`See report html at: ${sourcePath}/index.html`);
+    console.log(`See report html at: ${sourcePath}/report.html`);
   })
   .catch(err => console.error(err));
