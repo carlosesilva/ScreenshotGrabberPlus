@@ -63,6 +63,12 @@ diffconsole() {
   encoded=$4
   file=$5
 
+  # Check the passed in file exists in at least one of the directories.
+  if [ ! -f "$first/$encoded/$file.txt" ] && [ ! -f "$second/$encoded/$file.txt" ];
+  then
+    return;
+  fi
+
   # Diff the text files in both directories
   diff -Nau $first/$encoded/$file.txt $second/$encoded/$file.txt | tail -n +4 > $differences/$encoded/$file.diff
 
@@ -127,7 +133,7 @@ for urlpath in $(find $first -type d -maxdepth 1 -mindepth 1) ; do
   comparescreenshots $first $second $differences $encoded
 
   # Compare the console messages/errors for this url
-  # diffconsole $first $second $differences $encoded 'console'
+  diffconsole $first $second $differences $encoded 'console'
   diffconsole $first $second $differences $encoded 'error'
 
   # Remove url directory from difference directory if it is empty
@@ -141,8 +147,7 @@ done
 # Display results.
 if [ "$(ls -A $differences)" ]
 then
-  echo 'We have found some differences. See the full report at:'
-  echo $differences
+  node visualize.js $differences
   exit 1
 else
   echo 'There were no differences.'

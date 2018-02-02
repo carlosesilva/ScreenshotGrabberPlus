@@ -16,7 +16,7 @@ function escapeHtml(text) {
 const getDirectories = source =>
   fs
     .readdirSync(source)
-    .map(name => `./${path.join(source, name)}`)
+    .map(name => `${path.join(source, name)}`)
     .filter(page => fs.lstatSync(page).isDirectory());
 
 const getConsoleDiff = pagePath =>
