@@ -14,20 +14,16 @@ comparescreenshots() {
 
   # Check both screenshot files exist.
   if [ ! -f "$first/$encoded/screenshot.png" ]; then
-    echo "[!] No screenshot found in $first/$encoded/screenshot.png."
     return 1
   fi
-  firstscreenshot=$first/$encoded/screenshot.png
-
   if [ ! -d "$second/$encoded" ]; then
-    echo "[!] No matching directory in $second/$encoded for $first/$encoded."
+    return 1
+  fi
+  if [ ! -f "$second/$encoded/screenshot.png" ]; then
     return 1
   fi
 
-  if [ ! -f "$second/$encoded/screenshot.png" ]; then
-    echo "[!] No screenshot found in $second/$encoded/screenshot.png."
-    return 1
-  fi
+  firstscreenshot=$first/$encoded/screenshot.png
   secondscreenshot=$second/$encoded/screenshot.png
 
   # Get screenshot dimensions
@@ -42,16 +38,12 @@ comparescreenshots() {
 
     # If the compare command above exited with a 0
     if [ $? -eq 0 ]; then
-        # clean up since the screenshots are identical
-        rm "$differences/$encoded/screenshot.png"
-      # else
-        # the screenshot is not identical meaning something has changed on the page.
-        # echo "$encoded does not match"
+      # clean up since the screenshots are identical
+      rm "$differences/$encoded/screenshot.png"
     fi
   else
     # The dimensions didn't match, just add the images side by side to show the difference in height.
     convert "$firstscreenshot" "$secondscreenshot" +append "$differences/$encoded/screenshot.png"
-    # echo "$encoded is a different height"
   fi
 }
 
@@ -150,5 +142,5 @@ then
   node visualize.js $differences
   exit 1
 else
-  echo 'There were no differences.'
+  echo "There weren't any differences."
 fi
