@@ -51,7 +51,8 @@ const getScreenshotDiff = pagePath =>
   fs
     .access(`${pagePath}/screenshot.png`)
     .then(() => {
-      const html = `<div class="screenshot-diff"><h4>Screenshot Diff</h4><p><a href="${pagePath}/screenshot.png" target="_blank" ><img src="${pagePath}/screenshot.png" /></a></p></div>`;
+      const imagePath = `${path.basename(pagePath)}/screenshot.png`;
+      const html = `<div class="screenshot-diff"><h4>Screenshot Diff</h4><p><a href="${imagePath}" target="_blank" ><img src="${imagePath}" /></a></p></div>`;
       return html;
     })
     .catch((err) => {
@@ -84,9 +85,9 @@ const getReport = (pagePath) => {
   return report;
 };
 
-const source = './reports/library-prod-vs-library-upgrade';
+const sourcePath = process.argv[2];
 
-const dirs = getDirectories(source);
+const dirs = getDirectories(sourcePath);
 
 const reportPromises = dirs.map(getReport);
 
@@ -119,6 +120,9 @@ Promise.all(reportPromises)
       </body>
       </html>
     `;
-    return fs.writeFile('index.html', reportHtml);
+    return fs.writeFile(`${sourcePath}/index.html`, reportHtml);
+  })
+  .then(() => {
+    console.log(`See report html at: ${sourcePath}/index.html`);
   })
   .catch(err => console.error(err));
