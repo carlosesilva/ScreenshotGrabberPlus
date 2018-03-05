@@ -14,20 +14,16 @@ comparescreenshots() {
 
   # Check both screenshot files exist.
   if [ ! -f "$first/$encoded/screenshot.png" ]; then
-    echo "[!] No screenshot found in $first/$encoded/screenshot.png."
     return 1
   fi
-  firstscreenshot=$first/$encoded/screenshot.png
-
   if [ ! -d "$second/$encoded" ]; then
-    echo "[!] No matching directory in $second/$encoded for $first/$encoded."
+    return 1
+  fi
+  if [ ! -f "$second/$encoded/screenshot.png" ]; then
     return 1
   fi
 
-  if [ ! -f "$second/$encoded/screenshot.png" ]; then
-    echo "[!] No screenshot found in $second/$encoded/screenshot.png."
-    return 1
-  fi
+  firstscreenshot=$first/$encoded/screenshot.png
   secondscreenshot=$second/$encoded/screenshot.png
 
   # Get screenshot dimensions
@@ -42,16 +38,12 @@ comparescreenshots() {
 
     # If the compare command above exited with a 0
     if [ $? -eq 0 ]; then
-        # clean up since the screenshots are identical
-        rm "$differences/$encoded/screenshot.png"
-      # else
-        # the screenshot is not identical meaning something has changed on the page.
-        # echo "$encoded does not match"
+      # clean up since the screenshots are identical
+      rm "$differences/$encoded/screenshot.png"
     fi
   else
     # The dimensions didn't match, just add the images side by side to show the difference in height.
     convert "$firstscreenshot" "$secondscreenshot" +append "$differences/$encoded/screenshot.png"
-    # echo "$encoded is a different height"
   fi
 }
 
@@ -61,16 +53,21 @@ diffconsole() {
   second=$2
   differences=$3
   encoded=$4
+  file=$5
 
-  differencefile=$differences/$encoded/console.diff
+  # Check the passed in file exists in at least one of the directories.
+  if [ ! -f "$first/$encoded/$file.txt" ] && [ ! -f "$second/$encoded/$file.txt" ];
+  then
+    return;
+  fi
 
   # Diff the text files in both directories
-  diff -Nau --exclude='*.png' $first/$encoded $second/$encoded > $differencefile
+  diff -Nau $first/$encoded/$file.txt $second/$encoded/$file.txt | tail -n +4 > $differences/$encoded/$file.diff
 
   # If the diff file is empty, remove it.
-  if [ ! -s $differencefile ]
+  if [ ! -s $differences/$encoded/$file.diff ]
   then
-    rm $differencefile
+    rm $differences/$encoded/$file.diff
   fi
 }
 
@@ -128,7 +125,8 @@ for urlpath in $(find $first -type d -maxdepth 1 -mindepth 1) ; do
   comparescreenshots $first $second $differences $encoded
 
   # Compare the console messages/errors for this url
-  diffconsole $first $second $differences $encoded
+  diffconsole $first $second $differences $encoded 'console'
+  diffconsole $first $second $differences $encoded 'error'
 
   # Remove url directory from difference directory if it is empty
   if [ ! "$(ls -A $differences/$encoded)" ]
@@ -141,9 +139,8 @@ done
 # Display results.
 if [ "$(ls -A $differences)" ]
 then
-  echo 'We have found some differences. See the full report at:'
-  echo $differences
+  node visualize.js $differences
   exit 1
 else
-  echo 'There were no differences.'
+  echo "There weren't any differences."
 fi
