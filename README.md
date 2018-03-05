@@ -204,6 +204,12 @@ To get a list of popular sites or URLs, check the Google Analytics account under
 
 ## Changelog
 
+### v0.4.0
+
+The compare script now creates an html page for you to visualize the differences more easily
+
+Added option to drop the host part of the url in reports to make it easier to compare urls from 2 different environments (e.g.: Staging vs Prod)
+
 ### v0.3.1
 
 Improved error handling
