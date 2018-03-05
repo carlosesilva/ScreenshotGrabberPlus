@@ -35,20 +35,20 @@ It is also capable of authenticating before visiting the urls so that you can ca
 
 ## How to use
 
-1. Clone this repo
-2. Go into its directory using your favorite terminal program
+1.  Clone this repo
+2.  Go into its directory using your favorite terminal program
 
 ```
 $ cd path/to/repo
 ```
 
-3. Install npm packages
+3.  Install npm packages
 
 ```
 $ npm install
 ```
 
-4. Create a .txt file with the urls you want to process (one per line).
+4.  Create a .txt file with the urls you want to process (one per line).
 
 ```
 https://google.com
@@ -56,7 +56,7 @@ https://bing.com
 https://yahoo.com
 ```
 
-5. Run the program
+5.  Run the program
 
 ```
 $ node index.js --urls=urls.txt
@@ -64,20 +64,21 @@ $ node index.js --urls=urls.txt
 
 ## Parameters
 
-| Parameter               | Description                                                                                  | Default           |
-| ----------------------- | -------------------------------------------------------------------------------------------- | ----------------- |
-| `directory`             | The directory name to save the screenshots in.                                               | Current date time |
-| `urls`                  | Path to file with the list of urls                                                           | `'urls.txt'`      |
-| `auth`                  | Path to the authentication file. See more info about [authentication](#authentication) below | Not set           |
-| `max-tabs`              | The maximum number of tabs allowed to open at the same time per browser.                     | `5`               |
-| `max-browsers`          | The maximum number of browsers instances allowed to open at the same time.                   | `4`               |
-| `viewport-width`        | Specify a custom viewport width in pixels.                                                   | 800               |
-| `viewport-height`       | Specify a custom viewport height in pixels.                                                  | 600               |
-| `not-headless`          | If set to true, the browser will not open in headless mode                                   | Not set           |
-| `skip-page-console-log` | Skip the capture of console messages found in page.                                          | Not set           |
-| `skip-page-error-log`   | Skip the capture of console errors found in page.                                            | Not set           |
-| `verbose`               | Display additional program infomation.                                                       | Not set           |
-| `help`                  | Display the help screen.                                                                     | Not set           |
+| Parameter               | Description                                                                                                                                                          | Default           |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| `directory`             | The directory name to save the screenshots in.                                                                                                                       | Current date time |
+| `urls`                  | Path to file with the list of urls                                                                                                                                   | `'urls.txt'`      |
+| `auth`                  | Path to the authentication file. See more info about [authentication](#authentication) below                                                                         | Not set           |
+| `max-tabs`              | The maximum number of tabs allowed to open at the same time per browser.                                                                                             | `5`               |
+| `max-browsers`          | The maximum number of browsers instances allowed to open at the same time.                                                                                           | `4`               |
+| `viewport-width`        | Specify a custom viewport width in pixels.                                                                                                                           | 800               |
+| `viewport-height`       | Specify a custom viewport height in pixels.                                                                                                                          | 600               |
+| `not-headless`          | If set to true, the browser will not open in headless mode                                                                                                           | Not set           |
+| `skip-page-console-log` | Skip the capture of console messages found in page.                                                                                                                  | Not set           |
+| `skip-page-error-log`   | Skip the capture of console errors found in page.                                                                                                                    | Not set           |
+| `do-not-include-host`   | Do not include the host part of the url in the directory name. This is useful for comparing the same pages but on different enviroments such as Devl, Staging, Prod. | Not set           |
+| `verbose`               | Display additional program infomation.                                                                                                                               | Not set           |
+| `help`                  | Display the help screen.                                                                                                                                             | Not set           |
 
 ## Authentication
 
@@ -131,18 +132,57 @@ Use the [compare.sh](/compare.sh) script to visualy compare the screenshots and 
 $ bash compare.sh <path/to/report1> <path/to/report2>
 ```
 
-### Example:
-
-```
-$ node index.js --directory 1999
-$ node index.js --directory 2000
-$ bash compare.sh ./report/1999 ./report/2000
-```
-
-Note: You need to have [ImageMagick](https://www.imagemagick.org) installed on your computer. The easiest way to install on a mac is to use [Homebrew](http://brew.sh/)
+Note: You need to have [ImageMagick](https://www.imagemagick.org) installed on your computer to compare the screenshots. The easiest way to install it on a mac is to use [Homebrew](http://brew.sh/)
 
 ```
 $ brew install imagemagick
+```
+
+### Examples:
+
+Compare a set of urls over a period of time
+
+```
+# Process the urls
+$ node index.js --directory 1999
+
+# Wait a year...
+
+# Process the same urls again
+$ node index.js --directory 2000
+
+# Now compare the screenshots from last year versus the ones from this year
+$ bash compare.sh ./report/1999 ./report/2000
+```
+
+Compare a set of urls before and after making changes to the website's code.
+
+```
+# Process the urls as they are now
+$ node index.js --directory Before
+
+# Make changes to your website's code...
+
+# Process the same urls again after the changes
+$ node index.js --directory After
+
+# Now compare the screenshots from Before the changes versus After the changes
+$ bash compare.sh ./report/Before ./report/After
+```
+
+Compare sets from 2 different environments such as Prod vs Staging.
+
+To make that possible use the `--do-not-include-host` flag.
+
+```
+# Process the pages at the Production server e.g.: https://example.com/blablabla
+$ node index.js --do-not-include-host --urls prod-urls.txt --directory Prod
+
+# Process the same pages again but at the Staging server e.g.: https://staging.example.com/blablabla
+$ node index.js --do-not-include-host --urls staging-urls.txt --directory Staging
+
+# Now compare the screenshots from the Staging server versus the Prod server
+$ bash compare.sh ./report/Prod ./report/Staging
 ```
 
 ## Tips on generating list of URLS
@@ -163,6 +203,12 @@ wp --url=www.example.com/ post list --fields=url --post_type=post,page --post_st
 To get a list of popular sites or URLs, check the Google Analytics account under Reports > Behavior > Content Drilldown and use Export into CSV. Then copy the list of urls from the .csv file into a .txt file (one url per line).
 
 ## Changelog
+
+### v0.4.0
+
+The compare script now creates an html page for you to visualize the differences more easily
+
+Added option to drop the host part of the url in reports to make it easier to compare urls from 2 different environments (e.g.: Staging vs Prod)
 
 ### v0.3.1
 
