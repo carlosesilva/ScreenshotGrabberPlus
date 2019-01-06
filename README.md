@@ -204,6 +204,10 @@ To get a list of popular sites or URLs, check the Google Analytics account under
 
 ## Changelog
 
+### v0.4.1
+
+Fix npm vulnerabilities
+
 ### v0.4.0
 
 The compare script now creates an html page for you to visualize the differences more easily
